@@ -131,8 +131,9 @@ var Module = ( function( copy, eventsAggregator, extend, MapResolver ){
 			var events = this.eventsMap;
 			var makeCallBack = function( fn ){
 				if( typeof id !== 'undefined' ){
+					// force object and Id to be passed into the event callback.
 					return function(){
-						var args = Array.prototype.unshift.call( arguments, object, id );
+						Array.prototype.unshift.call( arguments, object, id );
 						return fn.apply( this, arguments );
 					}
 				} else {

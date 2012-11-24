@@ -38,7 +38,7 @@ var ChatModule = Module.extend({
 		},
 		'views' : {
 			'click' : function( view, viewName, something, another ){
-				// console.log( arguments )
+				console.log( arguments )
 			},
 			'another' : function( b ){
 			}
