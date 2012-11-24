@@ -29,8 +29,8 @@ var MapResolver = (function( copy, eventsAggregator, MapFacade ){
 
 		// returns map name with greater context
 		getMapName : function(){
-			var alias = this.getName();
-			return alias ? ' object [inside \'' + alias + '\' map]' : '';
+			var name = this.getName();
+			return name ? ' object [inside \'' + name + '\' map]' : '';
 		},	
 
 		// fires any matching event callbacks that were set initially.	

@@ -56,8 +56,8 @@ var Module = ( function( copy, eventsAggregator, extend, MapResolver ){
 		// Logs out anything to the console (if console exists), prefixing the module's name if it has one.
 		log : function( message ){
 			if( typeof console == 'object' && typeof console.log == 'function' ){
-				var alias = this._alias ? this._alias + ' : ' : '';
-				console.log( alias + message );
+				var name = this._name ? this._name + ' : ' : '';
+				console.log( name + message );
 			}
 		},
 
@@ -108,8 +108,8 @@ var Module = ( function( copy, eventsAggregator, extend, MapResolver ){
 			},
 			add : function( mapName, objectName, object ){
 				// give the object an alias
-				if( typeof object._alias === 'undefined'){
-					object._alias = objectName;
+				if( typeof object._name === 'undefined'){
+					object._name = objectName;
 				}
 				this.bindMapping('on', mapName, objectName, object);		
 			},
