@@ -13,7 +13,7 @@ var App = Module.extend({
 var ChatModule = Module.extend({
 
 	initialize : function(){
-		this.views = this.createMap('cunt');
+		this.views = this.createMap('views');
 		this.views.add('conversations', {});
 		this.views.add('pokes', {});
 	},
