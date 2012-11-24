@@ -103,18 +103,18 @@ var Module = ( function( copy, eventsAggregator, extend, MapResolver ){
 
 		// Map events that are fired when we get, set or remove objects from a particular map.
 		mapEvents : {
-			get : function( mapping, id, object ){
+			get : function( map, id, object ){
 				// do something
 			},
-			add : function( mapping, id, object ){
+			add : function( map, id, object ){
 				// give the object an alias
 				if( typeof object._alias === 'undefined'){
 					object._alias = id;
 				}
-				this.bindMapping('on', mapping, id, object);		
+				this.bindMapping('on', map, id, object);		
 			},
-			remove : function( mapping, id, object ){
-				this.bindMapping('off', mapping, id, object);
+			remove : function( map, id, object ){
+				this.bindMapping('off', map, id, object);
 			}
 		},
 
@@ -212,7 +212,7 @@ var Module = ( function( copy, eventsAggregator, extend, MapResolver ){
 				}
 			} catch ( e ){
 				var message = e.message + '\nMethod ' + method + '() Failed';
-				this.throwException( e, message );
+				this.throwException( e, new Error(message) );
 			}
 
 		},
