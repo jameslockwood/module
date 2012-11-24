@@ -27,6 +27,12 @@ var ChatModule = Module.extend({
 		this.views.get('pokes').trigger('click', true, false );
 		this.views.get('conversations').trigger('click', true, false, 'wahey' );
 
+		this.collection = new Backbone.Collection();
+
+		this.setEvents();
+
+		this.collection.add({})
+
 	},
 
 	stop: function(){
@@ -35,6 +41,7 @@ var ChatModule = Module.extend({
 
 	events : {
 		'views.pokes click' : function( something, another ){
+			console.log('boom.')
 		},
 		'views' : {
 			'click' : function( view, viewName, something, another ){
@@ -42,6 +49,9 @@ var ChatModule = Module.extend({
 			},
 			'another' : function( b ){
 			}
+		},
+		'collection add' : function(){
+			console.log( arguments );
 		}
 	}
 
