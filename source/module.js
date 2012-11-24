@@ -1,6 +1,6 @@
 var Module = ( function( copy, eventsAggregator, extend, MapResolver ){
 
-	// create strategy to deal with no jquery
+	// create strategy to deal with lack of $
 	var nojQuery = ( typeof $ == 'undefined' ? true : false );
 	var jqueryCheck = function(){
 		if( nojQuery ){	this.throwException( new Error('jQuery / zepto required for DOM manipulation.') );	}
@@ -18,22 +18,24 @@ var Module = ( function( copy, eventsAggregator, extend, MapResolver ){
 		// call base init function
 		this._initialize();
 
-		// call initialize function if it's available
+		// call initialize function, if it's available
 		if( typeof this.initialize == 'function' ){
 			this.initialize();
 		}
 
 	};
 
+	// allows constructor to be extended
 	Module.extend = extend;
 
 	Module.prototype = {
 
-		// base initialize function. required on all instances.
 		_initialize : function(){
 			this.setScope( this.scope );
+			this._setupEvents();
 		},
 
+		// Find DOM elements within the modules $scope. $scope is a jquery reference.
 		$: function(selector) {
 			jqueryCheck.call( this );
 			return this.$scope.find(selector);
@@ -51,6 +53,7 @@ var Module = ( function( copy, eventsAggregator, extend, MapResolver ){
 			this.throwException( new Error('Restart method has not been implemented on the module.'));
 		},
 
+		// Logs out anything to the console (if console exists), prefixing the module's name if it has one.
 		log : function( message ){
 			if( typeof console == 'object' && typeof console.log == 'function' ){
 				var alias = this._alias ? this._alias + ' : ' : '';
@@ -58,45 +61,7 @@ var Module = ( function( copy, eventsAggregator, extend, MapResolver ){
 			}
 		},
 
-		// Assigns utility getters / setters / delete, events etc to an object
-		createMap : function( alias ){
-
-			this._internals = this._internals || {};
-			this._internals._count = this._internals._count || 0;
-			this._internals._count++;
-
-			alias = ( !alias ? this._internals._count : alias );
-			
-			var mapping = this._internals[ alias ] = this._internals[ alias ] || {
-				data : {},
-				callbacks : this.mapEvents || {},
-				alias : alias
-			};
-
-			return new MapResolver( this, mapping );
-			
-		},
-
-		// fired whenever these actions are made against a mapping.
-		mapEvents : {
-			get : function( mapping, object, id ){
-				this.log('hey im getting ' + id + ' from ' + mapping )
-			},
-			add : function( mapping, object, id ){
-				this.log('hey im adding ' + id  + ' to ' + mapping );
-
-				// give the object an alias
-				if( typeof object._alias === 'undefined'){
-					object._alias = id;
-				}
-
-				// set our events				
-			},
-			remove : function( mapping, object, id ){
-				this.log('hey im removing ' + id  + ' from ' + mapping );
-			}
-		},
-
+		// Sets the modules scope element $scope
 		setScope : function( element ){
 			if( typeof element == 'object' && typeof element.selector != 'undefined' ){
 				element = element.selector;
@@ -105,18 +70,115 @@ var Module = ( function( copy, eventsAggregator, extend, MapResolver ){
 			this.$scope = ( nojQuery ? null : $( this.scope ) );
 		},
 
+		// Shows the modules scope element ($scope) - Note, all other DOM-level activity isn't the modules responsibility.
 		show : function(){
 			jqueryCheck.call( this );
 			this.$scope.show();
 		},
 
+		// Hides the modules scope element ($scope) - Note, all other DOM-level activity isn't the modules responsibility.
 		hide : function(){
 			jqueryCheck.call( this );
 			this.$scope.hide();
+		},		
+
+		// Creates a map to store objects.  Returns a facade get/set/delete/each/on/off to manipulate the map.
+		createMap : function( name ){
+
+			this._maps = this._maps || {};
+			this._maps.i = this._maps.i || 0;
+			this._maps.i++;
+
+			name = ( !name ? this._maps.i : name );
+
+			var map = this._maps[ name ] = {
+				data : {},
+				callbacks : this.mapEvents,
+				name : name
+			};
+
+			return new MapResolver( this, map );
+
 		},
 
-		// Traverse the prototype chain and call all matched methods bottom (base 'class') upwards.
-		_traversePrototype : function( method ){
+		// Map events that are fired when we get, set or remove objects from a particular map.
+		mapEvents : {
+			get : function( mapping, id, object ){
+				// do something
+			},
+			add : function( mapping, id, object ){
+				// give the object an alias
+				if( typeof object._alias === 'undefined'){
+					object._alias = id;
+				}
+				this.bindMapping('on', mapping, id, object);		
+			},
+			remove : function( mapping, id, object ){
+				this.bindMapping('off', mapping, id, object);
+			}
+		},
+
+		// Takes a map key, initiates event binding.
+		bindMapping : function( onOff, map, id, object ){
+			// check for direct references
+			this.bindKey( onOff, map + '.' + id, object );
+			// check for map references
+			this.bindKey( onOff, map, object, id )
+		},
+
+		// Takes a map key then binds/unbinds to any matching events.
+		bindKey : function( onOff, key, object, id ){
+			var events = this.eventsMap;
+			var makeCallBack = function( fn ){
+				if( typeof id !== 'undefined' ){
+					return function(){
+						var args = Array.prototype.unshift.call( arguments, object, id );
+						return fn.apply( this, arguments );
+					}
+				} else {
+					return fn;
+				}
+			}
+			if( events[key] ){
+				for( var event in events[key] ){
+					var callback = makeCallBack( events[key][event] );
+					object[onOff].call( object, event, callback, this );
+				}
+			}
+		},
+
+		// Iterates through an events property (if given), then standardizes all event handlers into a single
+		// object (eventsMap) to enable look-ups.
+		_setupEvents : function(){
+			var events = this.eventsMap = {};
+			function registerEvent( key, event, callback ){
+				events[key] = ( typeof events[key] == 'undefined' ? {} : events[key] );
+				events[key][event] = callback;
+			}
+			if( typeof this.events == 'object' ){
+				for( var i in this.events ){
+					var selector = i.split(' '),
+						key = selector[0],
+						event = selector[1],
+						value = this.events[i];
+
+					if( key && !event && typeof value == 'object'){
+						// we have an object literal containing multiple event / function pairs
+						for( var j in value ){
+							var eventKey = j,
+								fn = ( typeof value[j] == 'function' ? value[j] : false );
+							if( fn ) { registerEvent( key, eventKey, fn ); }
+						}
+					} else if( key && event && typeof value == 'function' ){
+						// we have an event and function pair
+						registerEvent( key, event, value )
+					}
+				}
+			}
+		},
+
+		// Traverse the up prototype chain and call all matched methods bottom (base 'class') upwards.
+		_traversePrototypeChain : function( method ){
 			if( typeof this[method] !== 'function' ){ return;}
 
 			var funcs = [],
@@ -154,6 +216,7 @@ var Module = ( function( copy, eventsAggregator, extend, MapResolver ){
 
 		},
 
+		// Throws out an error, triggers an error event (allows error chaining and improved error messaging).
 		throwException : function( error, message ){
 
 			var previousMessage = ( message ? message.split('\n')[0] : '' ),
@@ -171,7 +234,7 @@ var Module = ( function( copy, eventsAggregator, extend, MapResolver ){
 			}
 			this.trigger('error', latestMessage, error );
 			throw error;
-		}
+		}		
 
 	};
 
