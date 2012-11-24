@@ -6,7 +6,7 @@ var MapResolver = (function( copy, eventsAggregator, MapFacade ){
 		// where we store all objects within the map.
 		this.map = map.data;
 
-		// any matching event callbacks (get/set/remove) are called when appropriate
+		// any matching event callbacks (get/add/remove) are called when appropriate
 		this.eventCallbacks = map.callbacks || {};
 
 		// each map is given it's own name to aid recognition and error formatting.

@@ -31,8 +31,15 @@ var Module = ( function( copy, eventsAggregator, extend, MapResolver ){
 	Module.prototype = {
 
 		_initialize : function(){
+			// set a place to store 'private' stuff.
+			this._ = {};
+
+			// set dom scope
 			this.setScope( this.scope );
+
+			// register events
 			this._setupEvents();
+
 		},
 
 		// Find DOM elements within the modules $scope. $scope is a jquery reference.
@@ -82,18 +89,16 @@ var Module = ( function( copy, eventsAggregator, extend, MapResolver ){
 			this.$scope.hide();
 		},		
 
-		// Creates a map to store objects.  Returns a facade get/set/delete/each/on/off to manipulate the map.
+		// Creates a map to store objects.  Returns a facade get/add/remove/each/on/off to manipulate objects in the map.
 		createMap : function( name ){
 
-			this._maps = this._maps || {};
-			this._maps.i = this._maps.i || 0;
-			this._maps.i++;
+			var maps = this._.maps = this._maps || {};
+			maps.i = ( maps.i ? maps.i++ : 1 );
+			name = ( !name ? maps.i : name );
 
-			name = ( !name ? this._maps.i : name );
-
-			var map = this._maps[ name ] = {
+			var map = maps[ name ] = {
 				data : {},
-				callbacks : this.mapEvents,
+				callbacks : this._mapEvents,
 				name : name
 			};
 
@@ -102,7 +107,7 @@ var Module = ( function( copy, eventsAggregator, extend, MapResolver ){
 		},
 
 		// Map events that are fired when we get, set or remove objects from a particular map.
-		mapEvents : {
+		_mapEvents : {
 			get : function( mapName, objectName, object ){
 				// do something
 			},
@@ -111,24 +116,24 @@ var Module = ( function( copy, eventsAggregator, extend, MapResolver ){
 				if( typeof object._name === 'undefined'){
 					object._name = objectName;
 				}
-				this.bindMapping('on', mapName, objectName, object);		
+				this._bindMapping('on', mapName, objectName, object);		
 			},
 			remove : function( mapName, objectName, object ){
-				this.bindMapping('off', mapName, objectName, object);
+				this._bindMapping('off', mapName, objectName, object);
 			}
 		},
 
 		// Takes a map key, initiates event binding.
-		bindMapping : function( onOff, mapName, objectName, object ){
+		_bindMapping : function( onOff, mapName, objectName, object ){
 			// check for direct references
-			this.bindKey( onOff, mapName + '.' + objectName, object );
+			this._bindKey( onOff, mapName + '.' + objectName, object );
 			// check for map references
-			this.bindKey( onOff, mapName, object, objectName )
+			this._bindKey( onOff, mapName, object, objectName )
 		},
 
 		// Takes a map key then binds/unbinds to any matching events.
-		bindKey : function( onOff, key, object, id ){
-			var events = this.eventsMap;
+		_bindKey : function( onOff, key, object, id ){
+			var events = this._.eventsMap;
 			var makeCallBack = function( fn ){
 				if( typeof id !== 'undefined' ){
 					// force object and Id to be passed into the event callback.
@@ -143,6 +148,9 @@ var Module = ( function( copy, eventsAggregator, extend, MapResolver ){
 			if( events[key] ){
 				for( var event in events[key] ){
 					var callback = makeCallBack( events[key][event] );
+					if( typeof object[onOff] !== 'function' ){
+						this.throwException( new Error("Failed hooking up '" + event + "' event on '" + key + "' object as it has no " + onOff + "() method - No event aggregator is present on " + key + ".") );
+					}
 					object[onOff].call( object, event, callback, this );
 				}
 			}
@@ -151,7 +159,7 @@ var Module = ( function( copy, eventsAggregator, extend, MapResolver ){
 		// Iterates through an events property (if given), then standardizes all event handlers into a single
 		// object (eventsMap) to enable look-ups.
 		_setupEvents : function(){
-			var events = this.eventsMap = {};
+			var events = this._.eventsMap = {};
 			function registerEvent( key, event, callback ){
 				events[key] = ( typeof events[key] == 'undefined' ? {} : events[key] );
 				events[key][event] = callback;
@@ -175,8 +183,36 @@ var Module = ( function( copy, eventsAggregator, extend, MapResolver ){
 						registerEvent( key, event, value )
 					}
 				}
+			};
+
+			// now register our property blacklist
+			this._setupEventBlacklist();
+
+		},
+
+		_setupEventBlacklist : function(){
+			var blacklist = this._.eventsBlacklist = {};
+			for( var i in this ){
+				if( this.hasOwnProperty(i) && typeof this[i] == 'object' ){
+					blacklist[i] = i;
+				}
 			}
 		},
+
+		// sets events on any newly created objects.
+		setEvents : function(){
+			var blacklist = this._.eventsBlacklist;
+			var approved = {};
+			for( var i in this ){
+				if( this.hasOwnProperty(i) && typeof this[i] == 'object' && !blacklist[i] && !( this[i] instanceof MapFacade ) ){
+					approved[i] = i;
+				}
+			}
+			for( var j in approved ){
+				this._bindKey( 'off', j, this[j] );  // unbind any previous hooks
+				this._bindKey( 'on', j, this[j] );   // now bind to any event declarations
+			}
+		},		
 
 		// Traverse the up prototype chain and call all matched methods bottom (base 'class') upwards.
 		_traversePrototypeChain : function( method ){
