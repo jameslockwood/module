@@ -103,27 +103,27 @@ var Module = ( function( copy, eventsAggregator, extend, MapResolver ){
 
 		// Map events that are fired when we get, set or remove objects from a particular map.
 		mapEvents : {
-			get : function( map, id, object ){
+			get : function( mapName, objectName, object ){
 				// do something
 			},
-			add : function( map, id, object ){
+			add : function( mapName, objectName, object ){
 				// give the object an alias
 				if( typeof object._alias === 'undefined'){
-					object._alias = id;
+					object._alias = objectName;
 				}
-				this.bindMapping('on', map, id, object);		
+				this.bindMapping('on', mapName, objectName, object);		
 			},
-			remove : function( map, id, object ){
-				this.bindMapping('off', map, id, object);
+			remove : function( mapName, objectName, object ){
+				this.bindMapping('off', mapName, objectName, object);
 			}
 		},
 
 		// Takes a map key, initiates event binding.
-		bindMapping : function( onOff, map, id, object ){
+		bindMapping : function( onOff, mapName, objectName, object ){
 			// check for direct references
-			this.bindKey( onOff, map + '.' + id, object );
+			this.bindKey( onOff, mapName + '.' + objectName, object );
 			// check for map references
-			this.bindKey( onOff, map, object, id )
+			this.bindKey( onOff, mapName, object, objectName )
 		},
 
 		// Takes a map key then binds/unbinds to any matching events.
