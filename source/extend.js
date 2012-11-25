@@ -22,39 +22,39 @@ var utils = (function( utils ){
 	// Similar to `goog.inherits`, but uses a hash of prototype properties and
 	// class properties to be extended.
 	var inherits = function(parent, protoProps, staticProps) {
-		var subclass;
+		var module;
 
 		// The constructor function for the new subclass is either defined by you
 		// (the "constructor" property in your `extend` definition), or defaulted
 		// by us to simply call the parent's constructor.
 		if (protoProps && protoProps.hasOwnProperty('constructor')) {
-			subclass = protoProps.constructor;
+			module = protoProps.constructor;
 		} else {
-			subclass = function(){ parent.apply(this, arguments); };
+			module = function(){ parent.apply(this, arguments); };
 		}
 
 		// Inherit class (static) properties from parent.
-		utils.copy(subclass, parent);
+		utils.copy(module, parent);
 
 		// Set the prototype chain to inherit from `parent`, without calling
 		// `parent`'s constructor function.
 		ctor.prototype = parent.prototype;
-		subclass.prototype = new ctor();
+		module.prototype = new ctor();
 
 		// Add prototype properties (instance properties) to the subclass,
 		// if supplied.
-		if (protoProps) utils.copy(subclass.prototype, protoProps);
+		if (protoProps) utils.copy(module.prototype, protoProps);
 
 		// Add static properties to the constructor function, if supplied.
-		if (staticProps) utils.copy(subclass, staticProps);
+		if (staticProps) utils.copy(module, staticProps);
 
 		// Correctly set subclass's `prototype.constructor`.
-		subclass.prototype.constructor = subclass;
+		module.prototype.constructor = module;
 
 		// Set a convenience property in case the parent's prototype is needed later.
-		subclass.__super__ = parent.prototype;
+		module.__super__ = parent.prototype;
 
-		return subclass;
+		return module;
 	};
 
 	utils.extend = extend;
