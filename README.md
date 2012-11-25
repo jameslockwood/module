@@ -8,7 +8,7 @@ It allows apps to be easily built using a modular, declarative event-driven arch
 TODO - Intro about module here.. what a module knows about, what it doesn't, what are it's responsibilities, what aren't its responsibilities. Event-driven architecture.
 
 ###Creating a `Module` Constructor
-We create a Module constructor by extending the module constructor. We pass in an object literal containing properties and methods we wish to place on it's prototype.
+We create a Module by extending the module constructor. We pass in an object literal containing properties and methods we wish to place on it's prototype.
 
 The example below shows how we'd create a simple module that represents an application which consisting of: 
 - A chat sub-module
