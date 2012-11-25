@@ -10,12 +10,12 @@ TODO - Intro about module here.. what a module knows about, what it doesn't, wha
 ###Creating a `Module` Constructor
 We create a Module by extending the module constructor. We pass in an object literal containing properties and methods we wish to place on it's prototype.
 
-The example below shows how we'd create a simple module that represents an application which consisting of: 
+In the example below we'll create a simple module that represents an email-client application that consists of: 
 - A chat sub-module
 - An email sub-module
 - A notifications sub-module
 
-In this example, we create all of our sub modules and wire them together using event selectors in the `events` property.
+Within the module, we'll add all of our above sub modules.  Using the event selectors in the `events` property the added sub-modiles are then automatically wired together, mediator style.  Finally, we'll then start all of the sub-modules.
 
 ```JavaScript
 var App = Module.extend({
@@ -49,19 +49,19 @@ var App = Module.extend({
       this.start();
    },
 
-   // declare our app-level events to wire up our sub-modules using event selectors below:
+   // declare on events that our sub-modules will emit using event selectors:
    events: {
       // on errors of *any* of our sub-modules
       'modules error': function( moduleName, module, errorMessage ){
          this.log('Module ' + moduleName + ' failed - ' + errorMessage);
       },
 
-      // on new chat messages
+      // on new message from chat sub-module
       'modules.chat newMessage': function( message ){
          this.modules.get('notifications').newAlert('chat', message);
       },
 
-      // on new emails
+      // on new message from email sub-module
       'modules.email newMessage': function( message ){
          this.modules.get('notifications').newAlert('email', message)
       },
