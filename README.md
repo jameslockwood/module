@@ -11,15 +11,64 @@ TODO - Intro about module here.. what a module knows about, what it doesn't, wha
 We create a Module constructor by extending the module constructor ('class'). We pass in an object literal containing properties and methods we wish to place on it's prototype.
 
 ```JavaScript
-var MyModule = Module.extend({
-   initialize : function(){ 
-       console.log('hi');  // init function invoked upon object creation
+var App = Module.extend({
+
+   // Initialize is called when an instance of App is instantiated
+   initialize: function(){ 
+      // create a mapping to store sub-modules that comprise this app
+      this.modules = this.createMap('modules');
    },
-   start: function(){ ... },
-   stop: function(){ ... },
-   restart: function(){ ... },
-   doSomething : function( ) { .. },
-   someProperty : false
+
+   // strategy to start the app
+   start: function(){
+      // add the sub-modules that make up the application, passing in their DOM scope
+      this.modules.add('chat', new ChatModule({ scope: this.$('#chat') }));
+      this.modules.add('email', new EmailModule({ scope: this.$('#email') }));
+      this.modules.add('notifications', new NotifyModule({ scope: this.$('#notifications') }));
+
+      // start all of our sub-modules
+      this.modules.each('start');
+   },
+
+   // strategy to stop the app
+   stop: function(){
+      // remove all of our sub-modules
+      this.modules.remove();
+   },
+
+   // strategy to restart the app
+   restart: function(){
+      this.stop();
+      this.start();
+   },
+
+   // declare our app-level events to wire up our sub-modules using event selectors below:
+   events: {
+      // on errors of *any* of our sub-modules
+      'modules error': function( moduleName, module, errorMessage ){
+         this.log('Module ' + moduleName + ' failed - ' + errorMessage);
+      },
+
+      // on new chat messages
+      'modules.chat newMessage': function( message ){
+         this.modules.get('notifications').newAlert('chat', message);
+      },
+
+      // on new emails
+      'modules.email newMessage': function( message ){
+         this.modules.get('notifications').newAlert('email', message)
+      },
+
+      // an alternative way of hooking up the above events - here we're setting multiple on events for *all* sub modules
+      modules: {
+         error : function( moduleName, module, errorMessage ){
+            this.log('Module ' + moduleName + ' failed - ' + errorMessage);
+         },
+         newMessage : function( moduleName, module, message ){
+            this.modules.get('notifications').newAlert( moduleName, message );
+         }
+      }
+   }
 });
 ```
 
@@ -28,30 +77,12 @@ Each Module should have start,stop and restart methods to give us a strategy to 
 
 To make use of the constructor, simply
 ``` JavaScript
-var module = new MyModule();
+var module = new App();
 module.start()  // start up the module
 ```
 We can also pass in a literal into the constructor to add properties / methods to the object instance. E.g. Below we are setting the scope of the Module instance below.
 ``` JavaScript
-var module = new MyModule({
-   scope : '.module-wrapper',
-   someProperty : true
-});
-```
-
-###Extending a `Module`
-We can extend a Module so that behaviour and properties can be inherited.
-``` JavaScript
-var MyModule = Module.extend({
-   initialize : function(){ ... },
-   start: function(){ ... },
-   stop: function(){ ... },
-   restart: function(){ ... }
-});
- 
-var AnotherModule = MyModule.extend({
-   start: function(){
-      // here we're overriding the start method.
-   }
+var module = new App({
+   scope : '.module-wrapper'
 });
 ```
