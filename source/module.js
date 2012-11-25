@@ -37,8 +37,8 @@ var Module = ( function( copy, eventsAggregator, extend, MapResolver ){
 			// set dom scope
 			this.setScope( this.scope );
 
-			// register events
-			this._setupEvents();
+			// process the events selector (if provided)
+			this._processEventsSelector();
 
 		},
 
@@ -108,31 +108,32 @@ var Module = ( function( copy, eventsAggregator, extend, MapResolver ){
 
 		// Map events that are fired when we get, set or remove objects from a particular map.
 		_mapEvents : {
-			get : function( mapName, objectName, object ){
-				// do something
-			},
+			// get : function( mapName, objectName, object ){},
 			add : function( mapName, objectName, object ){
 				// give the object an alias
 				if( typeof object._name === 'undefined'){
 					object._name = objectName;
 				}
-				this._bindMapping('on', mapName, objectName, object);		
+
+				// hook object into any event selectors
+				this._bindMapObject('on', mapName, objectName, object);		
 			},
 			remove : function( mapName, objectName, object ){
-				this._bindMapping('off', mapName, objectName, object);
+				// unbind object from any event selectors
+				this._bindMapObject('off', mapName, objectName, object);
 			}
 		},
 
 		// Takes a map key, initiates event binding.
-		_bindMapping : function( onOff, mapName, objectName, object ){
+		_bindMapObject : function( onOff, mapName, objectName, object ){
 			// check for direct references
-			this._bindKey( onOff, mapName + '.' + objectName, object );
+			this._bindProperty( onOff, mapName + '.' + objectName, object );
 			// check for map references
-			this._bindKey( onOff, mapName, object, objectName )
+			this._bindProperty( onOff, mapName, object, objectName )
 		},
 
-		// Takes a map key then binds/unbinds to any matching events.
-		_bindKey : function( onOff, key, object, id ){
+		// Takes a property then binds/unbinds to any matching events.
+		_bindProperty : function( onOff, key, object, id ){
 			var events = this._.eventsMap;
 			var makeCallBack = function( fn ){
 				if( typeof id !== 'undefined' ){
@@ -156,9 +157,9 @@ var Module = ( function( copy, eventsAggregator, extend, MapResolver ){
 			}
 		},
 
-		// Iterates through an events property (if given), then standardizes all event handlers into a single
+		// Iterates through an events property (if given), then standardizes all event selectors into a single
 		// object (eventsMap) to enable look-ups.
-		_setupEvents : function(){
+		_processEventsSelector : function(){
 			var events = this._.eventsMap = {};
 			function registerEvent( key, event, callback ){
 				events[key] = ( typeof events[key] == 'undefined' ? {} : events[key] );
@@ -190,8 +191,11 @@ var Module = ( function( copy, eventsAggregator, extend, MapResolver ){
 
 		},
 
+		// denotes any object properties that we shouldn't be able to bind against using event selectors
 		_setupEventBlacklist : function(){
 			var blacklist = this._.eventsBlacklist = {};
+
+			// add any instance properties present at object construction to the blacklist
 			for( var i in this ){
 				if( this.hasOwnProperty(i) && typeof this[i] == 'object' ){
 					blacklist[i] = i;
@@ -202,56 +206,13 @@ var Module = ( function( copy, eventsAggregator, extend, MapResolver ){
 		// sets events on any newly created objects.
 		setEvents : function(){
 			var blacklist = this._.eventsBlacklist;
-			var approved = {};
 			for( var i in this ){
 				if( this.hasOwnProperty(i) && typeof this[i] == 'object' && !blacklist[i] && !( this[i] instanceof MapFacade ) ){
-					approved[i] = i;
+					this._bindProperty( 'off', i, this[i] );  // unbind any previous hooks
+					this._bindProperty( 'on', i, this[i] );   // now bind to any event declarations
 				}
-			}
-			for( var j in approved ){
-				this._bindKey( 'off', j, this[j] );  // unbind any previous hooks
-				this._bindKey( 'on', j, this[j] );   // now bind to any event declarations
 			}
 		},		
-
-		// Traverse the up prototype chain and call all matched methods bottom (base 'class') upwards.
-		_traversePrototypeChain : function( method ){
-			if( typeof this[method] !== 'function' ){ return;}
-
-			var funcs = [],
-				traverse = function( obj ){
-					if( typeof obj[method] == 'function' ){
-						storeFunction( obj[method] );
-					}
-					// IE doesnt support getPrototypeOf, so using __proto__ at the moment.  :(
-					if( obj.__proto__ ){
-						arguments.callee( obj.__proto__ );
-					}
-				},
-				storeFunction = function( fn ){
-					var match = false;
-					for ( var i in funcs ){
-						match = ( funcs[i] === fn ? true : match );
-						if( match ){ break; }
-					}
-					if( !match ){
-						funcs.unshift( fn );
-					}
-				},
-				args = Array.prototype.slice.call( arguments, 1 );
-
-			traverse( this );
-
-			try{
-				for ( var i in funcs ){
-					funcs[i].apply( this, args );
-				}
-			} catch ( e ){
-				var message = e.message + '\nMethod ' + method + '() Failed';
-				this.throwException( e, new Error(message) );
-			}
-
-		},
 
 		// Throws out an error, triggers an error event (allows error chaining and improved error messaging).
 		throwException : function( error, message ){
