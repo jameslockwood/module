@@ -84,12 +84,10 @@ Each Module should have start,stop and restart methods to give us a strategy to 
 
 To make use of the constructor, simply
 ``` JavaScript
-var module = new App();
-module.start()  // start up the module
-```
-We can also pass in a literal into the constructor to add properties / methods to the object instance. E.g. Below we are setting the scope of the Module instance below.
-``` JavaScript
-var module = new App({
-   scope : '.module-wrapper'
+var app = new App({
+   scope : '#email-client'  // pass in the applications DOM scope
 });
+app.start()  // start up the module
 ```
+We can also pass in a literal into the constructor to add properties / methods to the object instance. E.g. Just like above where we are setting the scope of the Module.
+
