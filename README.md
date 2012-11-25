@@ -9,7 +9,7 @@ TODO - Intro about module here.. what a module knows about, what it doesn't, wha
 We create a Module constructor by extending the module constructor ('class'). We pass in an object literal containing properties and methods we wish to place on it's prototype. This syntax is very similar to Backbone's.
 
 ```JavaScript
-BaseModule = Module.extend({
+MyModule = Module.extend({
    initialize : function(){ 
        console.log('hi');  // init function invoked upon object creation
    },
@@ -26,26 +26,28 @@ Each Module should have start,stop and restart methods to give us a strategy to 
 
 To make use of the constructor, simply
 ``` JavaScript
-var myModule = new BaseModule();
+var module = new MyModule();
+module.start()  // start up the module
 ```
 We can also pass in a literal into the constructor to add properties / methods to the object instance. E.g. Below we are setting the scope of the Module instance below.
 ``` JavaScript
-var myModule = new BaseModule({
-  scope : '.module-wrapper'
+var module = new MyModule({
+   scope : '.module-wrapper',
+   someProperty : true
 });
 ```
 
 ###Extending
 Just like with Backbone, we can extend a Module so that behaviour and properties can be inherited.
 ``` JavaScript
-BaseModule = Module.extend({
+MyModule = Module.extend({
    initialize : function(){ ... },
    start: function(){ ... },
    stop: function(){ ... },
    restart: function(){ ... }
 });
  
-AnotherModule = BaseModule.extend({
+AnotherModule = MyModule.extend({
    start: function(){
       // here we're overriding the start method.
    }
