@@ -1,6 +1,6 @@
 ##Module JS
 
-ModuleJS is a lightweight library that provides high-level structure to complex web applications, encouraging the creation of apps that comprise of several disparate, self-contained modules.
+ModuleJS is a lightweight library that provides high-level architectural structure to complex web applications, encouraging the creation of apps that comprise of several disparate, self-contained modules.
 
 It allows apps to be built easily using a modular, declarative event-driven framework.  Each module has it's own DOM scope and is self-concerned, while leaving it's lower-level implementation choices (such as an individual module's strategy of using views, models etc.) to the developer.
 
