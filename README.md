@@ -82,7 +82,7 @@ var App = Module.extend({
 Each Module should have start,stop and restart methods to give us a strategy to install or uninstall. Additionally, if an initialize method is supplied, it will be invoked upon creation.
 
 
-To make use of the constructor that we've created above, simply
+To make use of the constructor that we've created above, simply instantiate then start:
 ``` JavaScript
 var app = new App({
    scope : '#email-client'  // pass in the applications DOM scope
