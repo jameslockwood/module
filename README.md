@@ -38,7 +38,7 @@ var module = new MyModule({
 ```
 
 ###Extending a `Module`
-Just like with Backbone, we can extend a Module so that behaviour and properties can be inherited.
+We can extend a Module so that behaviour and properties can be inherited.
 ``` JavaScript
 var MyModule = Module.extend({
    initialize : function(){ ... },
