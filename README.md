@@ -6,7 +6,7 @@ A lightweight library for creating large-scale modular JavaScript applications
 TODO - Intro about module here.. what a module knows about, what it doesn't, what are it's responsibilities, what aren't its responsibilities. Event-driven architecture.
 
 ###Creating a `Module` Constructor
-We create a Module constructor by extending the module constructor ('class'). We pass in an object literal containing properties and methods we wish to place on it's prototype. This syntax is very similar to Backbone's.
+We create a Module constructor by extending the module constructor ('class'). We pass in an object literal containing properties and methods we wish to place on it's prototype.
 
 ```JavaScript
 var MyModule = Module.extend({
