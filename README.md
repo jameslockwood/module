@@ -49,31 +49,28 @@ var App = Module.extend({
       this.start();
    },
 
-   // declare on events that our sub-modules will emit using event selectors:
+   // declare 'on' events that our sub-modules will emit using event selectors
    events: {
-      // on errors of *any* of our sub-modules
-      'modules error': function( moduleName, module, errorMessage ){
-         this.log('Module ' + moduleName + ' failed - ' + errorMessage);
-      },
-
-      // on new message from chat sub-module
-      'modules.chat newMessage': function( message ){
-         this.modules.get('notifications').newAlert('chat', message);
-      },
-
-      // on new message from email sub-module
-      'modules.email newMessage': function( message ){
-         this.modules.get('notifications').newAlert('email', message)
-      },
-
-      // an alternative way of hooking up the above events - here we're setting multiple on events for *all* sub modules
-      modules: {
-         error : function( moduleName, module, errorMessage ){
+      // multiple 'on' events applying to *all* sub-modules
+      'modules': {
+         // when one of the sub-modules produces an error
+         'error' : function( moduleName, module, errorMessage ){
             this.log('Module ' + moduleName + ' failed - ' + errorMessage);
          },
-         newMessage : function( moduleName, module, message ){
+         // when one of the sub-modules receives a new message
+         'newMessage' : function( moduleName, module, message ){
             this.modules.get('notifications').newAlert( moduleName, message );
          }
+      },
+
+      // when our email sub-module has sent an email
+      'modules.email sent': function( details ){
+         this.modules.get('notifications').newConfirmation( details );
+      },
+
+      // when our chat sub-module receives a friend request
+      'modules.chat friendRequest': function( details ){
+         this.modules.get('notifications').newAlert( 'friendRequest', details );
       }
    }
 });
