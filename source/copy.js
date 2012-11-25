@@ -1,5 +1,6 @@
+var utils = ( typeof utils !== 'undefined' ? utils : {} );
 
-var copy = (function(){
+var utils = (function(){
 
   //     Extend lifted from Underscore source code.
   
@@ -50,11 +51,13 @@ var copy = (function(){
     return obj;
   };
 
-  return copy;
+  utils.copy = copy;
 
-})();
+  return utils;
 
-var keys = (function(){
+})( utils || {} );
+
+var utils = (function(){
 
   var ArrayProto = Array.prototype, ObjProto = Object.prototype, FuncProto = Function.prototype;
 
@@ -71,6 +74,8 @@ var keys = (function(){
     return keys;
   };
 
-  return keys;
+  utils.keys = keys;
 
-})();
+  return utils;
+
+})( utils ? utils : {} );

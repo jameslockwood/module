@@ -1,5 +1,5 @@
 
-var MapResolver = (function( copy, eventsAggregator, MapFacade ){
+var MapResolver = (function( utils, eventsAggregator, MapFacade ){
 
 	function MapResolver( module, map ){
 
@@ -52,7 +52,7 @@ var MapResolver = (function( copy, eventsAggregator, MapFacade ){
 		// sets a single object within the map
 		SET_SINGLE : function( id, obj ){
 			if( typeof obj.on === 'undefined'){
-				copy( obj, eventsAggregator );
+				utils.copy( obj, eventsAggregator );
 			}
 			this.fireEvent( 'add', id, obj );
 			return this.map[id] = obj;
@@ -146,4 +146,4 @@ var MapResolver = (function( copy, eventsAggregator, MapFacade ){
 
 	return MapResolver;
 
-})( copy, eventsAggregator, MapFacade );
+})( utils, eventsAggregator, MapFacade );

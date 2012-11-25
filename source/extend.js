@@ -1,5 +1,5 @@
 
-var extend = (function( copy ){
+var utils = (function( utils ){
 
 	//     Lifted from Backbone.js 0.9.2
 
@@ -34,7 +34,7 @@ var extend = (function( copy ){
 		}
 
 		// Inherit class (static) properties from parent.
-		copy(subclass, parent);
+		utils.copy(subclass, parent);
 
 		// Set the prototype chain to inherit from `parent`, without calling
 		// `parent`'s constructor function.
@@ -43,10 +43,10 @@ var extend = (function( copy ){
 
 		// Add prototype properties (instance properties) to the subclass,
 		// if supplied.
-		if (protoProps) copy(subclass.prototype, protoProps);
+		if (protoProps) utils.copy(subclass.prototype, protoProps);
 
 		// Add static properties to the constructor function, if supplied.
-		if (staticProps) copy(subclass, staticProps);
+		if (staticProps) utils.copy(subclass, staticProps);
 
 		// Correctly set subclass's `prototype.constructor`.
 		subclass.prototype.constructor = subclass;
@@ -57,6 +57,8 @@ var extend = (function( copy ){
 		return subclass;
 	};
 
-	return extend;
+	utils.extend = extend;
 
-})( copy );
+	return utils;
+
+})( utils || {} );

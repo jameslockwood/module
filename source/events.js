@@ -1,8 +1,8 @@
 
 
-var eventsAggregator = (function( copy, keys ){
+var eventsAggregator = (function( utils ){
 
-  //     Events lifted from Backbone js
+  //     Events Aggregator lifted from Backbone js
   //     (c) 2010-2012 Jeremy Ashkenas, DocumentCloud Inc.
   //     Backbone may be freely distributed under the MIT license.
   //     For all details and documentation:
@@ -66,7 +66,7 @@ var eventsAggregator = (function( copy, keys ){
 
       // Loop through the listed events and contexts, splicing them out of the
       // linked list of callbacks if appropriate.
-      events = events ? events.split(eventSplitter) : keys(calls);
+      events = events ? events.split(eventSplitter) : utils.keys(calls);
       while (event = events.shift()) {
         node = calls[event];
         delete calls[event];
@@ -121,6 +121,6 @@ var eventsAggregator = (function( copy, keys ){
 
   return Events;
 
-}).call( this, copy, keys );
+}).call( this, utils );
 
 

@@ -1,4 +1,4 @@
-var Module = ( function( copy, eventsAggregator, extend, MapResolver ){
+var Module = ( function( utils, eventsAggregator, MapResolver ){
 
 	// create strategy to deal with lack of $
 	var nojQuery = ( typeof $ == 'undefined' ? true : false );
@@ -10,10 +10,10 @@ var Module = ( function( copy, eventsAggregator, extend, MapResolver ){
 	Module = function( opts ){
 
 		// install events aggregator onto the Module
-		copy( this, eventsAggregator );
+		utils.copy( this, eventsAggregator );
 
 		// mergin in options onto the instance
-		copy( this, opts );
+		utils.copy( this, opts );
 
 		// call base init function
 		this._initialize();
@@ -26,7 +26,7 @@ var Module = ( function( copy, eventsAggregator, extend, MapResolver ){
 	};
 
 	// allows constructor to be extended
-	Module.extend = extend;
+	Module.extend = utils.extend;
 
 	Module.prototype = {
 
@@ -203,7 +203,8 @@ var Module = ( function( copy, eventsAggregator, extend, MapResolver ){
 			}
 		},
 
-		// sets events on any newly created objects.
+		// sets events on any created objects that have matching event selectors
+		// map objects are exluded from this as event selectors are automatically hooked-up on object add.
 		setEvents : function(){
 			var blacklist = this._.eventsBlacklist;
 			for( var i in this ){
@@ -238,6 +239,6 @@ var Module = ( function( copy, eventsAggregator, extend, MapResolver ){
 
 	return Module;
 
-})( copy, eventsAggregator, extend, MapResolver );
+})( utils, eventsAggregator, MapResolver );
 
 
