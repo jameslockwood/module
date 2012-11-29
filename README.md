@@ -15,7 +15,7 @@ In the example below we'll create a simple module that represents an email-clien
 - An email sub-module
 - A notifications sub-module
 
-Within the module, we'll add all of our above sub modules.  Using the event selectors in the `events` property the added sub-modiles are then automatically wired together, mediator style.  Finally, we'll then start all of the sub-modules.
+Within the module, we'll add all of our above sub modules.  Using the event selectors in the `events` property the added sub-modules are then automatically wired together, mediator style.  Finally, we'll then start all of the sub-modules.
 
 ```JavaScript
 var App = Module.extend({
