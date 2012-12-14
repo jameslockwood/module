@@ -52,7 +52,7 @@ var App = Module.extend({
    // declare 'on' events that our sub-modules will emit using event selectors
    events: {
       // multiple 'on' events applying to *all* sub-modules
-      'modules': {
+      'modules.*': {
          // when one of the sub-modules produces an error
          'error' : function( moduleName, module, errorMessage ){
             this.log('Module ' + moduleName + ' failed - ' + errorMessage);
