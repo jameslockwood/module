@@ -18,7 +18,7 @@ var ChatModule = Module.extend({
 
 		// so, set events to bind collection events to our event selectors
 		// you don't need to do this if you're just using object maps (i.e. the views above)
-		this.setEvents();
+		this.bindEvents();
 
 		// event will now get picked up.
 		// this.collection.add({})
