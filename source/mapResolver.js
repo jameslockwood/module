@@ -1,7 +1,7 @@
 
 var MapResolver = (function( utils, eventsAggregator, MapFacade ){
 
-	function MapResolver( module, map ){
+	function MapResolver( map ){
 
 		// where we store all objects within the map.
 		this.map = map.data;
@@ -9,11 +9,17 @@ var MapResolver = (function( utils, eventsAggregator, MapFacade ){
 		// any matching event callbacks (get/add/remove) are called when appropriate
 		this.eventCallbacks = map.callbacks || {};
 
+		// set context of the callbacks (if any)
+		this.callbacksContext = map.callbacksContext || null;
+
 		// each map is given it's own name to aid recognition and error formatting.
 		this.name = map.name;
 
-		// a reference to the main module. used to throw errors.
-		this.module = module;
+		// set our error handler, if it's been provided, otherwise throw the error.
+		this.errorHandler = map.errorHandler || function( e ){ throw e; };
+
+		// states the number of items in the map
+		this.length = 0;
 		
 		// return a sandboxed object
 		return new MapFacade( this );
@@ -31,19 +37,19 @@ var MapResolver = (function( utils, eventsAggregator, MapFacade ){
 		getMapName : function(){
 			var name = this.getName();
 			return name ? ' object [inside \'' + name + '\' map]' : '';
-		},	
+		},
 
-		// fires any matching event callbacks that were set initially.	
+		// fires any matching event callbacks that were set initially.
 		fireEvent : function( event, id, obj ){
 			if( event && typeof this.eventCallbacks[ event ] == 'function' ){
-				this.eventCallbacks[ event ].call( this.module, this.name, id, obj );
+				this.eventCallbacks[ event ].call( this.callbacksContext, this.name, id, obj );
 			}
 		},
 
 		// gets a single object within the map
 		GET_SINGLE : function( id ){
 			if( typeof this.map[ id ] === 'undefined' ){
-				this.module.throwException( new Error( 'Object "' + id + '" was requested but not found.') );
+				this.errorHandler( new Error( 'Object "' + id + '" was requested but not found.') );
 			}
 			this.fireEvent( 'get', id, this.map[id] );
 			return this.map[ id ];
@@ -54,14 +60,38 @@ var MapResolver = (function( utils, eventsAggregator, MapFacade ){
 			if( typeof obj.on === 'undefined'){
 				utils.copy( obj, eventsAggregator );
 			}
+			this.length++;
 			this.fireEvent( 'add', id, obj );
 			return this.map[id] = obj;
+		},
+
+		// sets a single object within the map
+		SET_MULTIPLE : function( mappings ){
+			if( typeof mappings !== 'object'){
+				this.errorHandler( new Error( 'Cannot set multiple map objects - mappings argument is not an object.' ) );
+			}
+			// for each object passed through
+			for( var i in mappings ){
+				var id = i,
+					instance = mappings[i];
+				if( typeof instance != 'object' ){
+					this.errorHandler( new Error( 'Map object not found - was of type ' + typeof instance ) );
+				}
+				// set each instance
+				this.SET_SINGLE( id, instance );
+			}
+			return this;
 		},
 
 		// removes a single object within the map
 		REMOVE_SINGLE : function( id ){
 			this.fireEvent( 'remove', id, this.map[id] );
-			delete this.map[id];
+			if( typeof this.map[id] !== 'undefined' ){
+				this.map[id] = null;
+				delete this.map[id];
+				this.length--;
+			}
+			return this;
 		},
 
 		// removes all objects within the map
@@ -69,26 +99,22 @@ var MapResolver = (function( utils, eventsAggregator, MapFacade ){
 			for( var id in this.map ){
 				this.REMOVE_SINGLE( id );
 			}
+			return this;
 		},
 
-		// calls a method on a single object within the map. 
+		// calls a method on a single object within the map.
 		INVOKE_SINGLE_METHOD : function( id, method, arg1, arg2, argN ){
 			if ( this.map[ id ] ){
 				try {
 					if( typeof this.map[id][method] == 'function' ){
-						var args = Array.prototype.slice.call( arguments, 2 );	
+						var args = Array.prototype.slice.call( arguments, 2 );
 						return this.map[id][method].apply( this.map[id], args );
 					} else {
-						throw new Error( "The method '" + method + "()' is not defined on '" + id + "'" );
+						throw new Error( 'The method "' + method + '()" is not defined on ' + id + '.');
 					}
 				} catch (e) {
 					var message = e.message + "\nSo method '" + method + "()' failed on '" + id + "'" + this.getMapName();
-					
-					if( typeof this.map[id]['throwException'] == 'function' ){
-						this.map[id].throwException.call( this.map[id], e, message );
-					} else {
-						this.module.throwException( e, message );
-					}
+					this.errorHandler( e, message );
 				}
 			}
 		},
@@ -109,20 +135,19 @@ var MapResolver = (function( utils, eventsAggregator, MapFacade ){
 				} catch (e){
 					// throw recursive errors to prevent masking
 					if( e.name == 'ModuleException' ){ throw e; } else {
-
 						var message = e.message + "\nSo callback failed on '" + id + "'" + this.getMapName();
-
-						throw this.module.throwException( e, message );
+						this.errorHandler( e, message );
 					}
 				}
 			}
 		},
 
-		// each object in the map is injected into the callback 
+		// each object in the map is injected into the callback
 		INVOKE_MULTIPLE_CALLBACK : function( callback, context ){
 			for( var id in this.map ){
 				this.INVOKE_SINGLE_CALLBACK( id, callback, context );
 			}
+			return this;
 		},
 
 		// calls a defined method on each object within the map
@@ -132,6 +157,7 @@ var MapResolver = (function( utils, eventsAggregator, MapFacade ){
 				Array.prototype.unshift.call( args, id );
 				this.INVOKE_SINGLE_METHOD.apply( this, args );
 			}
+			return this;
 		},
 
 		// calls a method on each object in the map if the method exists.
@@ -141,6 +167,7 @@ var MapResolver = (function( utils, eventsAggregator, MapFacade ){
 				Array.prototype.unshift.call( args, id );
 				this.INVOKE_SINGLE_METHOD_IF_EXISTS.apply( this, args );
 			}
+			return this;
 		}
 	};
 
