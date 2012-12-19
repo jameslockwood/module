@@ -54,7 +54,7 @@ var App = Module.extend({
       // multiple 'on' events applying to *all* sub-modules
       'modules.*': {
          // when one of the sub-modules produces an error
-         'error' : function( moduleName, module, errorMessage ){
+         'error' : function( moduleName, module, error, errorMessage ){
             this.log('Module ' + moduleName + ' failed - ' + errorMessage);
          },
          // when one of the sub-modules receives a new message
