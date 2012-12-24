@@ -1,0 +1,34 @@
+{
+  "name": "module",
+  "description": "Lightweight library to create modular JavaScript applications",
+  "version": "0.1.0",
+  "homepage": "https://github.com/jameslockwood/module",
+  "author": {
+    "name": "James Lockwood",
+    "email": "contact@jameslockwood.com",
+    "url": "jameslockwood.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jameslockwood/module.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jameslockwood/module/issues"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/jameslockwood/module/blob/master/LICENSE-MIT"
+    }
+  ],
+  "main": "lib/module",
+  "engines": {
+    "node": "*"
+  },
+  "scripts": {
+  },
+  "devDependencies": {
+    "grunt": "~0.3.17"
+  },
+  "keywords": []
+}

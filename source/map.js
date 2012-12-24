@@ -41,7 +41,7 @@ var Map = (function( utils, MapFacade ){
 		// returns map name with greater context
 		getMapName : function(){
 			var name = this.getName();
-			return name ? ' object [inside \'' + name + '\' map]' : '';
+			return name ? ' object [inside \'' + name + '\' map]' : ' object [inside anonymous map]';
 		},
 
 		// checks that a supplied map name is valid
