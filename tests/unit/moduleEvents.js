@@ -123,8 +123,7 @@ describe("Core Module Event Mechanism", function() {
 			module._processEventsSelector();
 
 			module.dog = {};
-
-			utils.copy( module.dog, eventsAggregator );
+			utils.installEventsTo( module.dog );
 			module.bindEvents();
 
 			// force the property to trigger an event
@@ -176,7 +175,7 @@ describe("Core Module Event Mechanism", function() {
 
 			// now create our property with its own events aggregator that we wish to bind to
 			module.dog = {};
-			utils.copy( module.dog, eventsAggregator );
+			utils.installEventsTo( module.dog );
 
 			// now bind the property with any declarations in our events selector
 			module._bindProperty( 'on', 'dog', module.dog );
@@ -212,7 +211,7 @@ describe("Core Module Event Mechanism", function() {
 			module._processEventsSelector();
 
 			module.dog = {};
-			utils.copy( module.dog, eventsAggregator );
+			utils.installEventsTo( module.dog );
 			module.bindEvents();
 
 			// force the property to trigger an event
@@ -277,7 +276,7 @@ describe("Core Module Event Mechanism", function() {
 			cars.add('ford', {});
 
 			var view = {};
-			utils.copy( view, eventsAggregator );
+			utils.installEventsTo( view );
 			testModule.view = view;
 			testModule.bindEvents();
 

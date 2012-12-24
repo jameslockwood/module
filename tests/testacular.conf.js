@@ -9,9 +9,7 @@ files = [
   JASMINE_ADAPTER,
 
   // our source files.  ordering is important as this isn't packaged code yet.
-  './source/copy.js',
-  './source/events.js',
-  './source/extend.js',
+  './source/utils.js',
   './source/mapFacade.js',
   './source/map.js',
   './source/module.js',

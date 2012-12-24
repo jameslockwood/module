@@ -6,13 +6,8 @@ describe("Core Module Map Resolver", function() {
 			map;
 
 		beforeEach(function() {
-			// set our default props.
-			var options = {
-				data : {},
-				name : 'testMap'
-			};
 			// create a map resolver.  by default this will return a map facade
-			mapFacade = new Map( options );
+			mapFacade = new Map( 'testMap' );
 			// get hold of the original from the map facade
 			map = mapFacade._map;
 		});
