@@ -9,10 +9,10 @@ var Module = ( function( utils, Map, MapFacade ){
 
 	Module = function( opts ){
 
-		// install events aggregator onto the Module
+		// install an events aggregator onto the Module
 		utils.installEventsTo( this );
 
-		// mergin in options onto the instance
+		// merge in in options onto the instance
 		utils.copy( this, opts );
 
 		// call base init function
@@ -30,7 +30,7 @@ var Module = ( function( utils, Map, MapFacade ){
 
 	Module.prototype = {
 
-		// base inititialize - always called to set up object properties. don't override!
+		// base inititialize - always called to set up object properties.
 		_initialize : function(){
 			// set a place to store 'private' stuff.
 			this._ = {};
@@ -54,10 +54,6 @@ var Module = ( function( utils, Map, MapFacade ){
 
 		stop : function(){
 			this.throwException( new Error('Stop method has not been implemented on the module.'));
-		},
-
-		restart : function(){
-			this.throwException( new Error('Restart method has not been implemented on the module.'));
 		},
 
 		// Logs out anything to the console (if console exists), prefixing the module's name if it has one.
