@@ -1,7 +1,23 @@
 
-var Map = (function( utils, eventsAggregator, MapFacade ){
+var Map = (function( utils, MapFacade ){
 
-	function Map( config ){
+	function Map( name, config ){
+
+		config = ( typeof config == 'object' ? config : {} );
+
+		// set our error handler
+		this.errorHandler = config.errorHandler || function( e ){ throw e; };
+
+		// ensure that we've been provided a correct name
+		if( typeof name !== 'string' && typeof name !== 'number' ){
+			this.errorHandler( new Error('A map name must be provided.') );
+		}
+		if( typeof name == 'string' && name.split(' ').join('').length < 1 ){
+			this.errorHandler( new Error('A map name must not be empty.') );
+		}
+
+		// each map is given it's own name to aid recognition and error formatting.
+		this.name = name;
 
 		// where we store all objects within the map.
 		this.map = {};
@@ -11,12 +27,6 @@ var Map = (function( utils, eventsAggregator, MapFacade ){
 
 		// set context of the callbacks (if any)
 		this.callbacksContext = config.callbacksContext || null;
-
-		// each map is given it's own name to aid recognition and error formatting.
-		this.name = config.name;
-
-		// set our error handler, if it's been provided, otherwise throw the error.
-		this.errorHandler = config.errorHandler || function( e ){ throw e; };
 
 		// states the number of items in the map
 		this.length = 0;
@@ -58,7 +68,7 @@ var Map = (function( utils, eventsAggregator, MapFacade ){
 		// sets a single object within the map
 		SET_SINGLE : function( id, obj ){
 			if( typeof obj.on === 'undefined'){
-				utils.copy( obj, eventsAggregator );
+				utils.installEventsTo( obj );
 			}
 			this.length++;
 			this.fireEvent( 'add', id, obj );
@@ -173,4 +183,4 @@ var Map = (function( utils, eventsAggregator, MapFacade ){
 
 	return Map;
 
-})( utils, eventsAggregator, MapFacade );
+})( utils, MapFacade );

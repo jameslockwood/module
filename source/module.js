@@ -1,4 +1,4 @@
-var Module = ( function( utils, eventsAggregator, Map, MapFacade ){
+var Module = ( function( utils, Map, MapFacade ){
 
 	// create strategy to deal with lack of $
 	var nojQuery = ( typeof $ == 'undefined' ? true : false );
@@ -10,7 +10,7 @@ var Module = ( function( utils, eventsAggregator, Map, MapFacade ){
 	Module = function( opts ){
 
 		// install events aggregator onto the Module
-		utils.copy( this, eventsAggregator );
+		utils.installEventsTo( this );
 
 		// mergin in options onto the instance
 		utils.copy( this, opts );
@@ -105,13 +105,12 @@ var Module = ( function( utils, eventsAggregator, Map, MapFacade ){
 			var mapConfig = {
 				callbacks : this._mapEvents,
 				callbacksContext : this,
-				name : name,
 				errorHandler : function(){
 					root.throwException.apply( root, arguments );
 				}
 			};
 
-			return new Map( mapConfig );
+			return new Map( name, mapConfig );
 
 		},
 
@@ -325,6 +324,6 @@ var Module = ( function( utils, eventsAggregator, Map, MapFacade ){
 
 	return Module;
 
-})( utils, eventsAggregator, Map, MapFacade );
+})( utils, Map, MapFacade );
 
 
