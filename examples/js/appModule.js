@@ -1,9 +1,8 @@
 var App = Module.extend({
 
 	initialize : function(){
-		this.modules = this.createMap();
+		this.modules = this.createMap('modules');
 		this.modules.add('chat', new ChatModule());
-		console.log( this );
 	},
 
 	start : function(){

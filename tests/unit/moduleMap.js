@@ -1,5 +1,39 @@
 describe("Core Module Map Resolver", function() {
 
+	describe('Map.checkName', function(){
+
+		beforeEach(function() {
+			// create a map resolver.  by default this will return a map facade
+			mapFacade = new Map( 'testMap' );
+			// get hold of the original from the map facade
+			map = mapFacade._map;
+			// strategy to check the name
+			checkName = function( name ){
+				return function(){
+					map.checkName( name );
+				};
+			};
+
+		});
+
+		it('Should throw an error when a string or int is not provided', function(){
+			// our valid cases
+			expect( checkName( 'test' ) ).not.toThrow();
+			expect( checkName( 1 ) ).not.toThrow();
+
+			// our invalid cases
+			expect( checkName( {} ) ).toThrow();
+			expect( checkName( null ) ).toThrow();
+			expect( checkName( undefined ) ).toThrow();
+		});
+
+		it('Should throw an error when a string is empty', function(){
+			expect( checkName('') ).toThrow();
+			expect( checkName(' ') ).toThrow();
+		});
+
+	});
+	
 	describe("Map", function() {
 
 		var mapFacade,

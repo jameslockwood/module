@@ -8,13 +8,8 @@ var Map = (function( utils, MapFacade ){
 		// set our error handler
 		this.errorHandler = config.errorHandler || function( e ){ throw e; };
 
-		// ensure that we've been provided a correct name
-		if( typeof name !== 'string' && typeof name !== 'number' ){
-			this.errorHandler( new Error('A map name must be provided.') );
-		}
-		if( typeof name == 'string' && name.split(' ').join('').length < 1 ){
-			this.errorHandler( new Error('A map name must not be empty.') );
-		}
+		// check the maps name is valid
+		this.checkName( name, true );
 
 		// each map is given it's own name to aid recognition and error formatting.
 		this.name = name;
@@ -49,6 +44,17 @@ var Map = (function( utils, MapFacade ){
 			return name ? ' object [inside \'' + name + '\' map]' : '';
 		},
 
+		// checks that a supplied map name is valid
+		checkName : function( name, map ){
+			// ensure that we've been provided a correct name
+			if( typeof name !== 'string' && typeof name !== 'number' ){
+				this.errorHandler( new Error('Name must be provided') );
+			}
+			if( typeof name == 'string' && ( name.split(' ').join('').length < 1 || name === '' ) ){
+				this.errorHandler( new Error('Name must not be empty') );
+			}
+		},
+
 		// fires any matching event callbacks that were set initially.
 		fireEvent : function( event, id, obj ){
 			if( event && typeof this.eventCallbacks[ event ] == 'function' ){
@@ -67,12 +73,28 @@ var Map = (function( utils, MapFacade ){
 
 		// sets a single object within the map
 		SET_SINGLE : function( id, obj ){
+
+			// ensure that the name is valid
+			try{
+				this.checkName( id );
+			} catch ( e ){
+				var message = e.message + "\nSo failed to add an" + this.getMapName();
+				this.errorHandler( e, message );
+			}
+
+			// install events aggregator onto the object
 			if( typeof obj.on === 'undefined'){
 				utils.installEventsTo( obj );
 			}
+
+			// store the object into the map
+			this.map[id] = obj;
+
+			// increment length and fire add event
 			this.length++;
 			this.fireEvent( 'add', id, obj );
-			return this.map[id] = obj;
+			
+			return obj;
 		},
 
 		// sets a single object within the map

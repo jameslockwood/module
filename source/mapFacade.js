@@ -12,7 +12,8 @@ var MapFacade = (function(){
 		add : function( name, object ){
 			if( typeof name == 'object' && typeof object == 'undefined'){
 				// object passed in to set multiple at one
-				return this._map.SET_MULTIPLE.apply( this._map, arguments );
+				this._map.SET_MULTIPLE.apply( this._map, arguments );
+				return this;
 			} else {
 				// single set.
 				return this._map.SET_SINGLE.apply( this._map, arguments );
