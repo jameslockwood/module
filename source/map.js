@@ -1,22 +1,22 @@
 
-var MapResolver = (function( utils, eventsAggregator, MapFacade ){
+var Map = (function( utils, eventsAggregator, MapFacade ){
 
-	function MapResolver( map ){
+	function Map( config ){
 
 		// where we store all objects within the map.
-		this.map = map.data;
+		this.map = {};
 
 		// any matching event callbacks (get/add/remove) are called when appropriate
-		this.eventCallbacks = map.callbacks || {};
+		this.eventCallbacks = config.callbacks || {};
 
 		// set context of the callbacks (if any)
-		this.callbacksContext = map.callbacksContext || null;
+		this.callbacksContext = config.callbacksContext || null;
 
 		// each map is given it's own name to aid recognition and error formatting.
-		this.name = map.name;
+		this.name = config.name;
 
 		// set our error handler, if it's been provided, otherwise throw the error.
-		this.errorHandler = map.errorHandler || function( e ){ throw e; };
+		this.errorHandler = config.errorHandler || function( e ){ throw e; };
 
 		// states the number of items in the map
 		this.length = 0;
@@ -26,7 +26,7 @@ var MapResolver = (function( utils, eventsAggregator, MapFacade ){
 
 	}
 
-	MapResolver.prototype = {
+	Map.prototype = {
 
 		// returns the maps name
 		getName : function(){
@@ -171,6 +171,6 @@ var MapResolver = (function( utils, eventsAggregator, MapFacade ){
 		}
 	};
 
-	return MapResolver;
+	return Map;
 
 })( utils, eventsAggregator, MapFacade );

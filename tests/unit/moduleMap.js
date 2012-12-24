@@ -1,6 +1,6 @@
 describe("Core Module Map Resolver", function() {
 
-	describe("MapResolver", function() {
+	describe("Map", function() {
 
 		var mapFacade,
 			map;
@@ -12,7 +12,7 @@ describe("Core Module Map Resolver", function() {
 				name : 'testMap'
 			};
 			// create a map resolver.  by default this will return a map facade
-			mapFacade = new MapResolver( options );
+			mapFacade = new Map( options );
 			// get hold of the original from the map facade
 			map = mapFacade._map;
 		});
@@ -58,7 +58,7 @@ describe("Core Module Map Resolver", function() {
 			expect( map.length ).toBe( 2 );
 			map.REMOVE_SINGLE( 'test' );
 			expect( map.length ).toBe( 1 );
-		});		
+		});
 
 		it('Should allow multiple objects to be added', function() {
 			map.SET_MULTIPLE({
@@ -101,7 +101,7 @@ describe("Core Module Map Resolver", function() {
 			};
 			// test for multiple args
 			map.SET_MULTIPLE({
-				'test1':{ 
+				'test1':{
 					testMethod : method
 				}
 			});
@@ -139,7 +139,7 @@ describe("Core Module Map Resolver", function() {
 			expect( x ).toBe( 4 );
 
 			map.INVOKE_MULTIPLE_METHOD( 'testMethod', 1, 2 );
-			expect( x ).toBe( 16 );				
+			expect( x ).toBe( 16 );
 		});
 
 		it('Should allow callbacks to be invoked on a single object', function() {
@@ -151,7 +151,7 @@ describe("Core Module Map Resolver", function() {
 			// test for multiple args and context
 			map.SET_MULTIPLE({
 				'test':{ a : 1 }
-			});		
+			});
 
 			map.INVOKE_SINGLE_CALLBACK( 'test', function( obj, name ){
 				objRef = obj;

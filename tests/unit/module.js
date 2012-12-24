@@ -20,14 +20,20 @@ describe("Module Constructor", function() {
 		});
 		it('Should call initialize() on instantiation', function() {
 			var test = null;
+			var _test = null;
 			var testModule = new Module({
 				initialize : function(){
 					test = true;
+				},
+				_initialize : function(){
+					_test = true;
 				}
 			});
 			expect( test ).toBe( true );
+			expect( _test ).toBe( true );
 		});
 	});
+	
 
 	describe("module scope", function() {
 		it('Should allow scope to be set and re-set', function() {
@@ -47,6 +53,13 @@ describe("Module Constructor", function() {
 			var map = testModule.createMap();
 			var comparator = ( map instanceof MapFacade );
 			expect( comparator ).toBe( true );
+		});
+		it('Should update the map count accordigly', function() {
+			var testModule = new Module();
+			testModule.createMap();
+			testModule.createMap();
+			testModule.createMap();
+			expect( testModule._.mapCount ).toBe( 3 );
 		});
 	});
 

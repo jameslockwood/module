@@ -7,9 +7,16 @@ basePath = '../';
 files = [
   JASMINE,
   JASMINE_ADAPTER,
-  './source/*.js',
 
-  // declare our test files
+  // our source files.  ordering is important as this isn't packaged code yet.
+  './source/copy.js',
+  './source/events.js',
+  './source/extend.js',
+  './source/mapFacade.js',
+  './source/map.js',
+  './source/module.js',
+
+  // our tests
   './tests/unit/*.js'
 ];
 

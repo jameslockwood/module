@@ -1,4 +1,4 @@
-var Module = ( function( utils, eventsAggregator, MapResolver, MapFacade ){
+var Module = ( function( utils, eventsAggregator, Map, MapFacade ){
 
 	// create strategy to deal with lack of $
 	var nojQuery = ( typeof $ == 'undefined' ? true : false );
@@ -63,8 +63,10 @@ var Module = ( function( utils, eventsAggregator, MapResolver, MapFacade ){
 		// Logs out anything to the console (if console exists), prefixing the module's name if it has one.
 		log : function( message ){
 			if( typeof console == 'object' && typeof console.log == 'function' ){
-				var name = this._name ? this._name + ' : ' : '';
-				console.log( name + message );
+				if( this._name ){
+					Array.prototype.unshift.call( arguments, this._name + ':' );
+				}
+				console.log.apply( console, arguments );
 			}
 		},
 
@@ -92,13 +94,15 @@ var Module = ( function( utils, eventsAggregator, MapResolver, MapFacade ){
 		// Creates a map to store objects.  Returns a facade get/add/remove/each/on/off to manipulate objects in the map.
 		createMap : function( name ){
 
-			var maps = this._.maps = this._maps || {};
-			maps.i = ( maps.i ? maps.i++ : 1 );
-			name = ( !name ? maps.i : name );
+			if( typeof name !== 'undefined' && typeof name !== 'string' ){
+				this.throwException( new Error('A map name must be a string.') );
+			}
+			this._.mapCount = ( this._.mapCount ? this._.mapCount : 0 );
+			this._.mapCount++;
+			name = ( !name ? this._.mapCount : name );
 
 			var root = this;
-			var map = maps[ name ] = {
-				data : {},
+			var mapConfig = {
 				callbacks : this._mapEvents,
 				callbacksContext : this,
 				name : name,
@@ -107,7 +111,7 @@ var Module = ( function( utils, eventsAggregator, MapResolver, MapFacade ){
 				}
 			};
 
-			return new MapResolver( map );
+			return new Map( mapConfig );
 
 		},
 
@@ -121,7 +125,6 @@ var Module = ( function( utils, eventsAggregator, MapResolver, MapFacade ){
 				if( typeof object._name === 'undefined'){
 					object._name = objectName;
 				}
-
 				// hook object into any event selectors
 				this._bindMapObject('on', mapName, objectName, object);
 			},
@@ -314,7 +317,7 @@ var Module = ( function( utils, eventsAggregator, MapResolver, MapFacade ){
 			} else {
 				if( error && error.message ){ latestMessage = error.message; }
 			}
-			this.trigger('error', latestMessage, error );
+			this.trigger('error', error, latestMessage );
 			throw error;
 		}
 
@@ -322,6 +325,6 @@ var Module = ( function( utils, eventsAggregator, MapResolver, MapFacade ){
 
 	return Module;
 
-})( utils, eventsAggregator, MapResolver, MapFacade );
+})( utils, eventsAggregator, Map, MapFacade );
 
 
