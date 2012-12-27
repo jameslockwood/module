@@ -11,7 +11,7 @@ var App = Module.extend({
 
 	stop: function() {
 		this.modules.each('stop');
-		this.models.remove();
+		this.modules.remove();
 	}
 
 });
