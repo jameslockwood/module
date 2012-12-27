@@ -1,6 +1,10 @@
-/*! module - v0.1.0 - 2012-12-24
+/*! module - v0.1.0 - 2012-12-27
 * https://github.com/jameslockwood/module
 * Copyright (c) 2012 James Lockwood; Licensed MIT */
+
+(function(){
+
+var root = this;
 
 var utils = (typeof utils !== 'undefined' ? utils : {});
 
@@ -906,3 +910,9 @@ var Module = ( function( utils, Map, MapFacade ){
 })( utils, Map, MapFacade );
 
 
+
+
+// Declare our exports
+root.Module = Module;
+
+}).call( this );
