@@ -226,7 +226,7 @@ describe("Core.Module", function() {
 		});
 
 		
-		it('Should correctly fire events on add / get / remove', function() {
+		it('Should correctly fire events on add / remove', function() {
 			
 			// set up an object to alter in our callbacks
 			var results = {
@@ -266,6 +266,34 @@ describe("Core.Module", function() {
 			expect( results.remove.mapName ).toBe( 'testMap' );
 			expect( results.remove.objectName ).toBe( 'testObject' );
 			expect( results.remove.obj.a ).toBe( 2 );
+
+		});
+
+		it('Should correctly fire events on add / remove for a mapping containing many objects', function() {
+			
+			var add = 0;
+			var remove = 0;
+
+			// create our callbacks
+			map.eventCallbacks = {
+				add : function( mapName, objectName, object ){
+					add+= object.a;
+				},
+				remove : function( mapName, objectName, object ){
+					remove+= object.a;
+				}
+			};
+
+			map.callbacksContext = this;
+
+			// now add, get and remove
+			map.SET_SINGLE( 'testObject', { a : 2 } );
+			map.SET_SINGLE( 'testObject', { a : 2 } );
+			map.SET_SINGLE( 'testObject', { a : 2 } );
+			map.REMOVE_SINGLE('testObject');
+
+			expect( add ).toBe( 6 );
+			expect( remove ).toBe( 6 );
 
 		});
 
