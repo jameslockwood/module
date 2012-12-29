@@ -1,4 +1,4 @@
-describe("Core Module Map Resolver", function() {
+describe("Core.Module", function() {
 
 	describe('Map.checkName', function(){
 
@@ -47,27 +47,32 @@ describe("Core Module Map Resolver", function() {
 		});
 
 		it('Should correctly store its map name', function() {
-			// getName
 			expect( map.getName() ).toBe( 'testMap' );
 		});
 
-		it('Should allow objects to be retrieved', function() {
-			// add manually
-			map.map.testObject = { a : 'curlyWurly' };
+		it('Should allow mappings to be retrieved', function() {
+			var testItem = {
+				test : 'ing'
+			};
+			var mapping = new Mapping();
+			mapping.add( testItem );
 
-			var obj = map.GET_SINGLE('testObject');
-			// then get
-			expect( obj.a ).toBe('curlyWurly');
+			// add in the mapping manually
+			map.map.testObject = mapping;
+
+			var retrievedObject = map.GET_SINGLE( 'testObject' );
+
+			expect( retrievedObject ).toBeDefined();
+			expect( retrievedObject.test ).toBe( 'ing' );
 		});
 
-
-		it('Should allow single objects to be added', function() {
+		it('Should allow single mappings to be added', function() {
 			map.SET_SINGLE( 'test', { a : 'curlyWurly' } );
 			var obj = map.GET_SINGLE('test');
 			expect( obj.a ).toBe('curlyWurly');
 		});
 
-		it('Should allow single objects to be removed', function() {
+		it('Should allow single mappings to be removed', function() {
 			map.SET_SINGLE( 'test', { a : 'curlyWurly' } );
 			map.REMOVE_SINGLE( 'test' );
 
@@ -89,7 +94,7 @@ describe("Core Module Map Resolver", function() {
 			expect( map.length ).toBe( 1 );
 		});
 
-		it('Should allow multiple objects to be added', function() {
+		it('Should allow multiple mappings to be added', function() {
 			map.SET_MULTIPLE({
 				'test1':{ a : 'curlyWurly' },
 				'test2':{ a : 'curlyShirly' },
@@ -107,13 +112,12 @@ describe("Core Module Map Resolver", function() {
 			expect( test3.a ).toBe('curlySausage');
 		});
 
-		it('Should allow multiple objects to be removed', function() {
+		it('Should allow multiple mappings to be removed', function() {
 			map.SET_MULTIPLE({
 				'test1':{ a : 'curlyWurly' },
 				'test2':{ a : 'curlyShirly' },
 				'test3':{ a : 'curlySausage' }
 			});
-
 
 			expect( map.length ).toBe( 3 );
 			map.REMOVE_MULTIPLE();
@@ -123,7 +127,7 @@ describe("Core Module Map Resolver", function() {
 			expect( errorFn ).toThrow();
 		});
 
-		it('Should allow methods to be invoked on a single object', function() {
+		it('Should allow methods to be invoked on a single mapping', function() {
 			var x = '';
 			var method = function( arg1, arg2 ){
 				x = ( arg1 ? arg1 : '' ) + ( arg2 ? arg2 : '' );
@@ -146,7 +150,7 @@ describe("Core Module Map Resolver", function() {
 			expect( x ).toBe( 'hello world' );
 		});
 
-		it('Should allow methods to be invoked on multiple objects', function() {
+		it('Should allow methods to be invoked on multiple mappings', function() {
 			var x = 0;
 			var method = function( arg1, arg2 ){
 				x+= ( arg1 ? arg1 : 0 ) + ( arg2 ? arg2 : 0 );
@@ -171,7 +175,7 @@ describe("Core Module Map Resolver", function() {
 			expect( x ).toBe( 16 );
 		});
 
-		it('Should allow callbacks to be invoked on a single object', function() {
+		it('Should allow callbacks to be invoked on a single mapping', function() {
 			var x = 0,
 				nameRef = '',
 				objRef = {},
@@ -196,7 +200,7 @@ describe("Core Module Map Resolver", function() {
 
 		});
 
-		it('Should allow callbacks to be invoked on multiple objects', function() {
+		it('Should allow callbacks to be invoked on multiple mappings', function() {
 
 			var x = 0,
 				nameString = '',
@@ -221,10 +225,11 @@ describe("Core Module Map Resolver", function() {
 
 		});
 
+		
 		it('Should correctly fire events on add / get / remove', function() {
 			
 			// set up an object to alter in our callbacks
-			results = {
+			var results = {
 				get : {},
 				add : {},
 				remove : {}
@@ -232,11 +237,6 @@ describe("Core Module Map Resolver", function() {
 
 			// create our callbacks
 			map.eventCallbacks = {
-				get : function( mapName, objectName, object ){
-					results.get.mapName = mapName;
-					results.get.objectName = objectName;
-					results.get.obj = object;
-				},
 				add : function( mapName, objectName, object ){
 					results.add.mapName = mapName;
 					results.add.objectName = objectName;
@@ -249,22 +249,18 @@ describe("Core Module Map Resolver", function() {
 				}
 			};
 
+			map.callbacksContext = this;
+
 			// now add, get and remove
 			map.SET_MULTIPLE({
 				'testObject':{ a : 2 }
 			});
-			map.GET_SINGLE('testObject');
 			map.REMOVE_SINGLE('testObject');
 
 			// test add callback execution
 			expect( results.add.mapName ).toBe( 'testMap' );
 			expect( results.add.objectName ).toBe( 'testObject' );
 			expect( results.add.obj.a ).toBe( 2 );
-
-			// test get callback execution
-			expect( results.get.mapName ).toBe( 'testMap' );
-			expect( results.get.objectName ).toBe( 'testObject' );
-			expect( results.get.obj.a ).toBe( 2 );
 
 			// test add callback execution
 			expect( results.remove.mapName ).toBe( 'testMap' );

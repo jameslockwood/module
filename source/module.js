@@ -112,9 +112,6 @@ var Module = ( function( utils, Map, MapFacade ){
 
 		// Default map events that are fired when we get, set or remove objects from a particular map.
 		_mapEvents : {
-			/*get : function( mapName, objectName, object ){
-				// incase we want to monitor when objects are retrieved to a map
-			},*/
 			add : function( mapName, objectName, object ){
 				// give the object a name we can identify it with
 				if( typeof object._name === 'undefined'){

@@ -7,7 +7,7 @@ var ChatModule = Module.extend({
 
 	start : function(){
 		// create some views
-		this.views.add( {
+		this.views.add({
 			'conversations' : new Backbone.View({el : this.$('#convo-container')}),
 			'pokes' : new Backbone.View({el : this.$('#pokes-container')}),
 			'notifications' : new Backbone.View({el : this.$('#notify-container')})

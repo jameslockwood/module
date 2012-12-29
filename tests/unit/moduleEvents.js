@@ -1,4 +1,4 @@
-describe("Core Module Event Mechanism", function() {
+describe("Core Module", function() {
 
 	describe("Events", function() {
 
@@ -10,7 +10,7 @@ describe("Core Module Event Mechanism", function() {
 
 		describe("RegisterEventHandler", function() {
 
-			it('Should be able to register an event handler', function() {
+			it('Should register an event handler', function() {
 				// register event handler
 				module._registerEventHandler( 'subModules','error', function(){} );
 
@@ -27,9 +27,9 @@ describe("Core Module Event Mechanism", function() {
 
 		});
 
-		describe("RegisterEventHandler", function() {
+		describe("GetEventHandlers", function() {
 
-			it('Should be able to retrieve an event handler', function() {
+			it('Should retrieve an event handler', function() {
 				// get event handler
 				module._registerEventHandler( 'subModules','error', function(){} );
 				module._registerEventHandler( 'subModules','error', function(){} );
@@ -46,7 +46,7 @@ describe("Core Module Event Mechanism", function() {
 
 		describe("EventsPropertyBlacklist", function() {
 
-			it('Should be able to identify properties that should be blacklisted from event handlers', function() {
+			it('Should identify properties that should be blacklisted from event handlers', function() {
 				// setup events blacklist
 				var testModule = new Module({
 					a : {},
@@ -63,7 +63,7 @@ describe("Core Module Event Mechanism", function() {
 	
 		describe('Event Selector Processing', function(){
 
-			it('Should be able to process an event selector', function() {
+			it('Should process an event selector', function() {
 
 				module.events = {
 					// single object binds to single event declaration
@@ -97,7 +97,7 @@ describe("Core Module Event Mechanism", function() {
 
 			});
 
-			it('Should be able to process an event selector with star declarations', function() {
+			it('Should process an event selector with star declarations', function() {
 
 				module.events = {
 
@@ -119,7 +119,7 @@ describe("Core Module Event Mechanism", function() {
 
 			});
 
-			it('Should be able to process a global star event selector', function() {
+			it('Should process a global star event selector', function() {
 
 				var x = 0;
 				// create our events selector
@@ -176,7 +176,7 @@ describe("Core Module Event Mechanism", function() {
 		});
 	
 		describe('bindProperty', function(){
-			it('Should be able to bind a property to an event', function() {
+			it('Should bind a property to an event', function() {
 				var x = 0;
 				// create our events selector
 				module.events = {
@@ -215,7 +215,7 @@ describe("Core Module Event Mechanism", function() {
 		});
 
 		describe('bindEvents', function(){
-			it('Should be able to bind normal object properties to an event selector', function() {
+			it('Should bind normal object properties to an event selector', function() {
 				var x = 0;
 				// create our events selector
 				module.events = {
@@ -247,7 +247,7 @@ describe("Core Module Event Mechanism", function() {
 
 		describe('bindMapObject', function(){
 
-			it('Should be able to bind and unbind a map object to an event selector', function() {
+			it('Should bind and unbind a map object to an event selector', function() {
 
 				var multiple = 0,
 					single = 0;
@@ -317,7 +317,7 @@ describe("Core Module Event Mechanism", function() {
 			expect( x ).toBe( 20 );
 		});
 
-		it('Should be able to unbind any event listeners on remove', function() {
+		it('Should unbind all event listeners on mapping remove', function() {
 
 			var multiple = 0,
 				single = 0;
@@ -365,6 +365,55 @@ describe("Core Module Event Mechanism", function() {
 			cars.each('emit','crash');
 			expect( single ).toBe( 4 );
 			expect( multiple ).toBe( 14 );
+
+		});
+
+
+		it('Should bind to multiple objects within a mapping', function() {
+
+			var multiple = 0,
+				single = 0;
+
+			// map add / remove
+			module.events = {
+				// single object binds to single event declaration
+				'cars.ferrari crash' : function(){ single++; },
+				// single object binds to multi event declarations
+				'cars.ferrari' : {
+					'crash' : function(){ single++; }
+				},
+				// multi objects binds to single event declaration
+				'cars crash' : function(){ multiple++; },
+
+				// multi objects bind to multi event declarations
+				'cars' : {
+					'crash' : function(){ multiple++; }
+				}
+			};
+			module._processEventsSelector();
+
+			var cars = module.cars = module.createMap('cars');
+
+			// add three objects within the 'ferrari' mapping
+			cars.add('ferrari',{});
+			cars.add('ferrari',{});
+			cars.add('ferrari',{});
+
+			// each object within the ferrari mapping should emit
+			cars.each('emit','crash');
+			expect( single ).toBe( 6 );
+			expect( multiple ).toBe( 6 );
+
+			cars.remove('ferrari');
+
+			cars.each('emit','crash');
+			expect( single ).toBe( 6 );
+			expect( multiple ).toBe( 6 );
+
+			cars.remove();
+			cars.each('emit','crash');
+			expect( single ).toBe( 6 );
+			expect( multiple ).toBe( 6 );
 
 		});
 

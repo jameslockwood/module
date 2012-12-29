@@ -11,6 +11,7 @@ files = [
   // our source files.  ordering is important as this isn't packaged code yet.
   './source/utils.js',
   './source/mapFacade.js',
+  './source/mapping.js',
   './source/map.js',
   './source/module.js',
 

@@ -1,6 +1,7 @@
 
-var Map = (function( utils, MapFacade ){
+var Map = (function( utils, MapFacade, Mapping ){
 
+	// Map object that stores multiple mappings.
 	function Map( name, config ){
 
 		config = ( typeof config == 'object' ? config : {} );
@@ -62,13 +63,38 @@ var Map = (function( utils, MapFacade ){
 			}
 		},
 
+		addToMapping : function( id, obj ){
+			var mapping = this.getMapping( id );
+			if ( typeof mapping === 'undefined' ){
+				mapping = this.map[id] = new Mapping();
+			}
+			mapping.add( obj );
+			this.length++;
+			this.fireEvent( 'add', id, obj );
+		},
+
+		removeMapping : function( id ){
+			var mapping = this.getMapping( id );
+			mapping.each( function( item ){
+				this.fireEvent( 'remove', id, item );
+				this.length--;
+			}, this );
+			delete this.map[id];
+		},
+
+		getMapping : function( id ){
+			return this.map[ id ];
+		},
+
 		// gets a single object within the map
 		GET_SINGLE : function( id ){
-			if( typeof this.map[ id ] === 'undefined' ){
+			var mapping = this.getMapping( id );
+			if( typeof mapping === 'undefined' ){
 				this.errorHandler( new Error( 'Object "' + id + '" was requested but not found.') );
 			}
-			this.fireEvent( 'get', id, this.map[id] );
-			return this.map[ id ];
+			var items = mapping.getItems();
+			// if multiple items, return array
+			return ( items.length == 1 ? items[0] : items );
 		},
 
 		// sets a single object within the map
@@ -87,25 +113,21 @@ var Map = (function( utils, MapFacade ){
 				utils.installEventsTo( obj );
 			}
 
-			// store the object into the map
-			this.map[id] = obj;
+			// store the object into the mapping array
+			this.addToMapping( id, obj );
 
-			// increment length and fire add event
-			this.length++;
-			this.fireEvent( 'add', id, obj );
-			
 			return obj;
 		},
 
 		// sets a single object within the map
-		SET_MULTIPLE : function( mappings ){
-			if( typeof mappings !== 'object'){
-				this.errorHandler( new Error( 'Cannot set multiple map objects - mappings argument is not an object.' ) );
+		SET_MULTIPLE : function( mappingItems ){
+			if( typeof mappingItems !== 'object'){
+				this.errorHandler( new Error( 'Cannot set multiple map objects - mapping items argument is not an object.' ) );
 			}
 			// for each object passed through
-			for( var i in mappings ){
+			for( var i in mappingItems ){
 				var id = i,
-					instance = mappings[i];
+					instance = mappingItems[i];
 				if( typeof instance != 'object' ){
 					this.errorHandler( new Error( 'Map object not found - was of type ' + typeof instance ) );
 				}
@@ -117,12 +139,7 @@ var Map = (function( utils, MapFacade ){
 
 		// removes a single object within the map
 		REMOVE_SINGLE : function( id ){
-			this.fireEvent( 'remove', id, this.map[id] );
-			if( typeof this.map[id] !== 'undefined' ){
-				this.map[id] = null;
-				delete this.map[id];
-				this.length--;
-			}
+			this.removeMapping( id );
 			return this;
 		},
 
@@ -136,34 +153,41 @@ var Map = (function( utils, MapFacade ){
 
 		// calls a method on a single object within the map.
 		INVOKE_SINGLE_METHOD : function( id, method, arg1, arg2, argN ){
-			if ( this.map[ id ] ){
-				try {
-					if( typeof this.map[id][method] == 'function' ){
-						var args = Array.prototype.slice.call( arguments, 2 );
-						return this.map[id][method].apply( this.map[id], args );
+			var originalArgs = Array.prototype.slice.call( arguments, 0 );
+			var mapping = this.getMapping( id );
+			try {
+				mapping.each( function( item ){
+					if( typeof item[method] == 'function' ){
+						var args = originalArgs.slice( 2 );
+						return item[method].apply( item, args );
 					} else {
 						throw new Error( 'The method "' + method + '()" is not defined on ' + id + '.');
 					}
-				} catch (e) {
-					var message = e.message + "\nSo method '" + method + "()' failed on '" + id + "'" + this.getMapName();
-					this.errorHandler( e, message );
-				}
+				}, this );
+			} catch (e) {
+				var message = e.message + "\nSo method '" + method + "()' failed on '" + id + "'" + this.getMapName();
+				this.errorHandler( e, message );
 			}
 		},
 
 		// same as above but no error if the method doesn't exist on the object.
 		INVOKE_SINGLE_METHOD_IF_EXISTS : function( id, method, arg1, arg2, argN ){
-			if ( this.map[ id ] && typeof this.map[id][method] == 'function' ){
-				var args = Array.prototype.slice.call( arguments, 2 );
-				return this.map[id][method].apply( this.map[id], args );
-			}
+			var originalArgs = Array.prototype.slice.call( arguments, 0 );
+			var mapping = this.getMapping( id );
+			mapping.each( function( item ){
+				if ( typeof item[method] == 'function' ){
+					var args = originalArgs.slice( 2 );
+					return item[method].apply( item, args );
+				}
+			}, this);
 		},
 
 		// gets a single object within the map and then injects it into a callback
 		INVOKE_SINGLE_CALLBACK : function( id, callback, context ){
-			if( this.map[ id ] ){
+			var mapping = this.getMapping( id );
+			mapping.each( function( item ){
 				try {
-					return callback.call( context || this.map[ id ], this.map[id], id );
+					return callback.call( context || item, item, id );
 				} catch (e){
 					// throw recursive errors to prevent masking
 					if( e.name == 'ModuleException' ){ throw e; } else {
@@ -171,7 +195,7 @@ var Map = (function( utils, MapFacade ){
 						this.errorHandler( e, message );
 					}
 				}
-			}
+			});
 		},
 
 		// each object in the map is injected into the callback
@@ -205,4 +229,4 @@ var Map = (function( utils, MapFacade ){
 
 	return Map;
 
-})( utils, MapFacade );
+})( utils, MapFacade, Mapping );
