@@ -336,7 +336,7 @@ var MapFacade = (function(){
 		},
 
 		// removes one / all of the objects in the map
-		remove : function( name ){
+		remove : function( name, optionalMapItemId ){
 			if( typeof name == 'undefined'){
 				this._map.REMOVE_MULTIPLE.apply( this._map, arguments );
 			} else
@@ -386,30 +386,41 @@ var Mapping = (function(){
 	Mapping.prototype = {
 
 		// add an item to the mapping
-		add : function( obj ){
-
+		add : function( obj, success, context ){
 			// increment the count, set unique id, then add to the items array
 			this.count++;
 			obj._mappingId = this.count;
 			this._items.push( obj );
+
+			if( typeof success === 'function' ){
+				success.call( context || this, obj );
+			}
 			return this;
 		},
 
 		// remove an item from the mapping
-		remove : function( itemId ){
+		remove : function( itemId, success, context ){
 
-			if( typeof itemId !== 'undefined' ){
-				// an item id has been passed in - try to remove a unique item
-				this.each( function( item, arrayIndex ){
-					if( item._mappingId === itemId ){
-						this._items.splice( arrayIndex, 1 );
-						return false;
-					}
-				});
-			} else {
-				// just remove all items
+			var callSuccess = function( item ){
+				if( typeof success === 'function' ){
+					success.call( context || this, item );
+				}
+			};
+			
+			this.each( function( item, arrayIndex ){
+				if( itemId && item._mappingId === itemId ){
+					// an item id has been passed in - try to remove a unique item
+					this._items.splice( arrayIndex, 1 );
+					callSuccess( item );
+					return false;
+				}
+				callSuccess( item );
+			});
+
+			if( !itemId ){
 				this._items.length = 0;
 			}
+
 			return this;
 		},
 
@@ -505,18 +516,27 @@ var Map = (function( utils, MapFacade, Mapping ){
 			if ( typeof mapping === 'undefined' ){
 				mapping = this.map[id] = new Mapping();
 			}
-			mapping.add( obj );
-			this.length++;
-			this.fireEvent( 'add', id, obj );
+			// add mapping, supplying on success callback
+			mapping.add( obj, function( item ){
+				this.length++;
+				this.fireEvent( 'add', id, item );
+			}, this );
 		},
 
 		removeMapping : function( id ){
 			var mapping = this.getMapping( id );
-			mapping.each( function( item ){
-				this.fireEvent( 'remove', id, item );
+
+			// remove mapping, supplying on success callback
+			mapping.remove( undefined, function( item ){
 				this.length--;
+				this.fireEvent( 'remove', id, item );
+				delete this.map[id];
 			}, this );
-			delete this.map[id];
+		},
+
+		removeMappingItem : function( id, mappingItemId ){
+			var mapping = this.getMapping( id );
+			mapping.remove( mappingItemId );
 		},
 
 		getMapping : function( id ){
@@ -575,8 +595,8 @@ var Map = (function( utils, MapFacade, Mapping ){
 		},
 
 		// removes a single object within the map
-		REMOVE_SINGLE : function( id ){
-			this.removeMapping( id );
+		REMOVE_SINGLE : function( id, optionalMappingItemId ){
+			this.removeMapping( id, optionalMappingItemId );
 			return this;
 		},
 

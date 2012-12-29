@@ -9,30 +9,41 @@ var Mapping = (function(){
 	Mapping.prototype = {
 
 		// add an item to the mapping
-		add : function( obj ){
-
+		add : function( obj, success, context ){
 			// increment the count, set unique id, then add to the items array
 			this.count++;
 			obj._mappingId = this.count;
 			this._items.push( obj );
+
+			if( typeof success === 'function' ){
+				success.call( context || this, obj );
+			}
 			return this;
 		},
 
 		// remove an item from the mapping
-		remove : function( itemId ){
+		remove : function( itemId, success, context ){
 
-			if( typeof itemId !== 'undefined' ){
-				// an item id has been passed in - try to remove a unique item
-				this.each( function( item, arrayIndex ){
-					if( item._mappingId === itemId ){
-						this._items.splice( arrayIndex, 1 );
-						return false;
-					}
-				});
-			} else {
-				// just remove all items
+			var callSuccess = function( item ){
+				if( typeof success === 'function' ){
+					success.call( context || this, item );
+				}
+			};
+			
+			this.each( function( item, arrayIndex ){
+				if( itemId && item._mappingId === itemId ){
+					// an item id has been passed in - try to remove a unique item
+					this._items.splice( arrayIndex, 1 );
+					callSuccess( item );
+					return false;
+				}
+				callSuccess( item );
+			});
+
+			if( !itemId ){
 				this._items.length = 0;
 			}
+
 			return this;
 		},
 

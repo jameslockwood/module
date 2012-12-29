@@ -43,7 +43,7 @@ var MapFacade = (function(){
 		},
 
 		// removes one / all of the objects in the map
-		remove : function( name ){
+		remove : function( name, optionalMapItemId ){
 			if( typeof name == 'undefined'){
 				this._map.REMOVE_MULTIPLE.apply( this._map, arguments );
 			} else

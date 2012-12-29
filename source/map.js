@@ -68,18 +68,27 @@ var Map = (function( utils, MapFacade, Mapping ){
 			if ( typeof mapping === 'undefined' ){
 				mapping = this.map[id] = new Mapping();
 			}
-			mapping.add( obj );
-			this.length++;
-			this.fireEvent( 'add', id, obj );
+			// add mapping, supplying on success callback
+			mapping.add( obj, function( item ){
+				this.length++;
+				this.fireEvent( 'add', id, item );
+			}, this );
 		},
 
 		removeMapping : function( id ){
 			var mapping = this.getMapping( id );
-			mapping.each( function( item ){
-				this.fireEvent( 'remove', id, item );
+
+			// remove mapping, supplying on success callback
+			mapping.remove( undefined, function( item ){
 				this.length--;
+				this.fireEvent( 'remove', id, item );
+				delete this.map[id];
 			}, this );
-			delete this.map[id];
+		},
+
+		removeMappingItem : function( id, mappingItemId ){
+			var mapping = this.getMapping( id );
+			mapping.remove( mappingItemId );
 		},
 
 		getMapping : function( id ){
@@ -138,8 +147,8 @@ var Map = (function( utils, MapFacade, Mapping ){
 		},
 
 		// removes a single object within the map
-		REMOVE_SINGLE : function( id ){
-			this.removeMapping( id );
+		REMOVE_SINGLE : function( id, optionalMappingItemId ){
+			this.removeMapping( id, optionalMappingItemId );
 			return this;
 		},
 
