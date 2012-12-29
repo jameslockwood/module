@@ -140,8 +140,8 @@ describe("Core Module Event Mechanism", function() {
 				utils.installEventsTo( module.dog );
 				module.bindEvents();
 
-				// force the property to trigger an event
-				module.dog.trigger('woof');
+				// force the property to emit an event
+				module.dog.emit('woof');
 
 				expect(x).toBe(30);
 
@@ -156,19 +156,19 @@ describe("Core Module Event Mechanism", function() {
 				// test that they exist as functions
 				expect( typeof module.on ).toBe( 'function' );
 				expect( typeof module.off ).toBe( 'function' );
-				expect( typeof module.trigger ).toBe( 'function' );
+				expect( typeof module.emit ).toBe( 'function' );
 
 				// now see if they work
 				module.on('test', function(){
 					x = 5;
 				});
 
-				module.trigger('test');
+				module.emit('test');
 				expect(x).toBe(5);
 
 				// turn off all events
 				module.off('test');
-				module.trigger('test');
+				module.emit('test');
 				expect(x).toBe(5);
 			});
 
@@ -206,8 +206,8 @@ describe("Core Module Event Mechanism", function() {
 				module._bindProperty( 'off', 'dog', module.dog );
 				module._bindProperty( 'on', 'dog', module.dog );
 
-				// force the property to trigger an event
-				module.dog.trigger('woof');
+				// force the property to emit an event
+				module.dog.emit('woof');
 
 				expect(x).toBe(20);
 
@@ -238,8 +238,8 @@ describe("Core Module Event Mechanism", function() {
 				utils.installEventsTo( module.dog );
 				module.bindEvents();
 
-				// force the property to trigger an event
-				module.dog.trigger('woof');
+				// force the property to emit an event
+				module.dog.emit('woof');
 
 				expect(x).toBe(20);
 			});
@@ -275,12 +275,12 @@ describe("Core Module Event Mechanism", function() {
 				module._processEventsSelector();
 
 				module._bindMapObject( 'on', 'cars', 'ford', cars.get('ford') );
-				cars.get('ford').trigger('crash');
+				cars.get('ford').emit('crash');
 				expect( single ).toBe( 2 );
 				expect( multiple ).toBe( 2 );
 
 				module._bindMapObject( 'off', 'cars', 'ford', cars.get('ford') );
-				cars.get('ford').trigger('crash');
+				cars.get('ford').emit('crash');
 				expect( single ).toBe( 2 );
 				expect( multiple ).toBe( 4 );
 
@@ -310,10 +310,10 @@ describe("Core Module Event Mechanism", function() {
 
 			expect( x ).toBe( 0 );
 
-			testModule.view.trigger('test');
+			testModule.view.emit('test');
 			expect( x ).toBe( 10 );
 
-			testModule.cars.get('ford').trigger('test');
+			testModule.cars.get('ford').emit('test');
 			expect( x ).toBe( 20 );
 		});
 
@@ -351,18 +351,18 @@ describe("Core Module Event Mechanism", function() {
 				'bugatti' : {}
 			});
 
-			cars.each('trigger','crash');
+			cars.each('emit','crash');
 			expect( single ).toBe( 2 );
 			expect( multiple ).toBe( 8 );
 
 			cars.remove('proton');
 
-			cars.each('trigger','crash');
+			cars.each('emit','crash');
 			expect( single ).toBe( 4 );
 			expect( multiple ).toBe( 14 );
 
 			cars.remove();
-			cars.each('trigger','crash');
+			cars.each('emit','crash');
 			expect( single ).toBe( 4 );
 			expect( multiple ).toBe( 14 );
 

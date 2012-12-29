@@ -24,7 +24,7 @@ var ChatModule = Module.extend({
 		'views.pokes test' : function( something, another ){
 			console.log('Test event picked up.');
 		},
-		'views' : {
+		'views.*' : {
 			'test' : function( view, viewName, something, another ){
 				console.log( arguments );
 			}

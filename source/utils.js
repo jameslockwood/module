@@ -233,11 +233,11 @@ var utils = (function(keys) {
 			return this;
 		},
 
-		// Trigger one or many events, firing all bound callbacks. Callbacks are
-		// passed the same arguments as `trigger` is, apart from the event name
+		// Emit one or many events, firing all bound callbacks. Callbacks are
+		// passed the same arguments as `emit` is, apart from the event name
 		// (unless you're listening on `"all"`, which will cause your callback to
 		// receive the true name of the event as the first argument).
-		trigger: function(events) {
+		emit: function(events) {
 			var event, node, calls, tail, args, all, rest;
 			if(!(calls = this._callbacks)) return this;
 			all = calls.all;
@@ -245,7 +245,7 @@ var utils = (function(keys) {
 			rest = slice.call(arguments, 1);
 
 			// For each event, walk through the linked list of callbacks twice,
-			// first to trigger the event, then to trigger any `"all"` callbacks.
+			// first to emit the event, then to emit any `"all"` callbacks.
 			while(event = events.shift()) {
 				if(node = calls[event]) {
 					tail = node.tail;

@@ -195,7 +195,7 @@ var Module = ( function( utils, Map, MapFacade ){
 				} else if( value == '-propagate' ){
 					return function(){
 						Array.prototype.unshift.call( arguments, event );
-						this.trigger.apply( this, arguments );
+						this.emit.apply( this, arguments );
 					};
 				}
 				this.throwException( new Error( value + " not found, so '"+ event + "' event could not be bound to '" + key + "' events selector." ) );
@@ -296,7 +296,7 @@ var Module = ( function( utils, Map, MapFacade ){
 			}
 		},
 
-		// Throws out an error, triggers an error event (allows error chaining and improved error messaging).
+		// Throws out an error, emits an error event (allows error chaining and improved error messaging).
 		throwException : function( error, message ){
 
 			var previousMessage = ( message ? message.split('\n')[0] : '' ),
@@ -312,7 +312,7 @@ var Module = ( function( utils, Map, MapFacade ){
 			} else {
 				if( error && error.message ){ latestMessage = error.message; }
 			}
-			this.trigger('error', error, latestMessage );
+			this.emit('error', error, latestMessage );
 			throw error;
 		}
 

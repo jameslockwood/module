@@ -1,11 +1,10 @@
-/*! module - v0.1.0 - 2012-12-27
+/*! module - v0.1.0 - 2012-12-29
 * https://github.com/jameslockwood/module
 * Copyright (c) 2012 James Lockwood; Licensed MIT */
 
 (function(){
-
+	
 var root = this;
-
 var utils = (typeof utils !== 'undefined' ? utils : {});
 
 // COPY ------------------------------------------------------------------------
@@ -241,11 +240,11 @@ var utils = (function(keys) {
 			return this;
 		},
 
-		// Trigger one or many events, firing all bound callbacks. Callbacks are
-		// passed the same arguments as `trigger` is, apart from the event name
+		// Emit one or many events, firing all bound callbacks. Callbacks are
+		// passed the same arguments as `emit` is, apart from the event name
 		// (unless you're listening on `"all"`, which will cause your callback to
 		// receive the true name of the event as the first argument).
-		trigger: function(events) {
+		emit: function(events) {
 			var event, node, calls, tail, args, all, rest;
 			if(!(calls = this._callbacks)) return this;
 			all = calls.all;
@@ -253,7 +252,7 @@ var utils = (function(keys) {
 			rest = slice.call(arguments, 1);
 
 			// For each event, walk through the linked list of callbacks twice,
-			// first to trigger the event, then to trigger any `"all"` callbacks.
+			// first to emit the event, then to emit any `"all"` callbacks.
 			while(event = events.shift()) {
 				if(node = calls[event]) {
 					tail = node.tail;
@@ -782,7 +781,7 @@ var Module = ( function( utils, Map, MapFacade ){
 				} else if( value == '-propagate' ){
 					return function(){
 						Array.prototype.unshift.call( arguments, event );
-						this.trigger.apply( this, arguments );
+						this.emit.apply( this, arguments );
 					};
 				}
 				this.throwException( new Error( value + " not found, so '"+ event + "' event could not be bound to '" + key + "' events selector." ) );
@@ -883,7 +882,7 @@ var Module = ( function( utils, Map, MapFacade ){
 			}
 		},
 
-		// Throws out an error, triggers an error event (allows error chaining and improved error messaging).
+		// Throws out an error, emits an error event (allows error chaining and improved error messaging).
 		throwException : function( error, message ){
 
 			var previousMessage = ( message ? message.split('\n')[0] : '' ),
@@ -899,7 +898,7 @@ var Module = ( function( utils, Map, MapFacade ){
 			} else {
 				if( error && error.message ){ latestMessage = error.message; }
 			}
-			this.trigger('error', error, latestMessage );
+			this.emit('error', error, latestMessage );
 			throw error;
 		}
 
@@ -912,7 +911,5 @@ var Module = ( function( utils, Map, MapFacade ){
 
 
 
-// Declare our exports
 root.Module = Module;
-
 }).call( this );
