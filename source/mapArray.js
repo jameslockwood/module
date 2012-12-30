@@ -35,13 +35,17 @@ var MapArray = (function(){
 			};
 			
 			this.each( function( item, arrayIndex ){
+
 				if( itemId && item._mapArrayId === itemId ){
 					// an item id has been passed in - try to remove a unique item
 					this._items.splice( arrayIndex, 1 );
 					callSuccess( item );
 					return false;
+				} else if( !itemId ){
+					// no item has been passed in, so all items are to be removed
+					// therefore call success item then empty array afterwards.
+					callSuccess( item );
 				}
-				callSuccess( item );
 			});
 
 			if( !itemId ){

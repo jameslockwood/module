@@ -290,9 +290,46 @@ describe("Module", function() {
 			map.setSingle( 'testObject', { a : 2 } );
 			map.setSingle( 'testObject', { a : 2 } );
 			map.setSingle( 'testObject', { a : 2 } );
+
+			// remove all objects
 			map.removeSingle('testObject');
 
 			expect( add ).toBe( 6 );
+			expect( remove ).toBe( 6 );
+
+		});
+
+		it('Should correctly emit a remove event when individual object is removed from map array', function() {
+			
+			var remove = 0;
+
+			// create our callbacks
+			map.eventCallbacks = {
+				remove : function( mapName, objectName, object ){
+					remove+= object.a;
+				}
+			};
+			map.callbacksContext = this;
+
+			// now add, get and remove
+			map.setSingle( 'testObject', { a : 2 } );
+			map.setSingle( 'testObject', { a : 2 } );
+			map.setSingle( 'testObject', { a : 2 } );
+
+			// get first objects ID that we added
+			var items = map.getSingle( 'testObject' );
+			var firstItemId = items[0]._mapArrayId;
+
+			// remove first object from the map array
+			map.removeSingle('testObject', firstItemId );
+
+			// now check our event handler has been invoked.
+			expect( remove ).toBe( 2 );
+
+			// remove all other objects
+			map.removeSingle('testObject');
+
+			// ensure other event handlers have been invoked.
 			expect( remove ).toBe( 6 );
 
 		});

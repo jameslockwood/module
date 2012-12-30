@@ -91,7 +91,9 @@ var Map = (function( utils, MapFacade, MapArray ){
 		// removes a specific object from a map array instance
 		removeMapArrayItem : function( id, mapArrayItemId ){
 			var mapArray = this.getMapArray( id );
-			mapArray.remove( mapArrayItemId );
+			mapArray.remove( mapArrayItemId, function( item ){
+				this.fireEvent( 'remove', id, item );
+			}, this );
 		},
 
 		getMapArray : function( id ){
@@ -151,7 +153,13 @@ var Map = (function( utils, MapFacade, MapArray ){
 
 		// removes a single map array, or unique item from a map array
 		removeSingle : function( id, optionalMapArrayItemId ){
-			this.removeMapArray( id, optionalMapArrayItemId );
+			if( typeof optionalMapArrayItemId === 'undefined' ){
+				// remove whole map array
+				this.removeMapArray( id );
+			} else {
+				// remove item from map array
+				this.removeMapArrayItem( id, optionalMapArrayItemId );
+			}
 			return this;
 		},
 
