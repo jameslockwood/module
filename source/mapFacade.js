@@ -14,43 +14,43 @@ var MapFacade = (function(){
 		add : function( name, object ){
 			if( typeof name == 'object' && typeof object == 'undefined'){
 				// object passed in to set multiple at one
-				this._map.SET_MULTIPLE.apply( this._map, arguments );
+				this._map.setMultiple.apply( this._map, arguments );
 				return this;
 			} else {
 				// single set.
-				return this._map.SET_SINGLE.apply( this._map, arguments );
+				return this._map.setSingle.apply( this._map, arguments );
 			}
 		},
 
 		// returns an object in the map of 'name' [string]
 		get : function( name ){
-			return this._map.GET_SINGLE.apply( this._map, arguments );
+			return this._map.getSingle.apply( this._map, arguments );
 		},
 
 		// iterates over each of our objects in the map
 		each : function( callbackOrMethod, contextOrArgs ){
 			if( typeof callbackOrMethod == 'string' ){
-				this._map.INVOKE_MULTIPLE_METHOD.apply( this._map, arguments );
+				this._map.invokeMultipleMethod.apply( this._map, arguments );
 			} else
 			if( typeof callbackOrMethod == 'function' ){
-				this._map.INVOKE_MULTIPLE_CALLBACK.apply( this._map, arguments );
+				this._map.invokeMultipleCallback.apply( this._map, arguments );
 			}
 			return this;
 		},
 
 		// tries to invoke a method on each object in the map, but doesn't error if the method is not found.
 		eachTry : function( methodName, args ){
-			this._map.INVOKE_MULTIPLE_METHOD_IF_EXISTS.apply( this._map, arguments );
+			this._map.invokeMultipleMethodIfExists.apply( this._map, arguments );
 			return this;
 		},
 
 		// removes one / all of the objects in the map
 		remove : function( name, optionalMapItemId ){
 			if( typeof name == 'undefined'){
-				this._map.REMOVE_MULTIPLE.apply( this._map, arguments );
+				this._map.removeMultiple.apply( this._map, arguments );
 			} else
 			if( typeof name == 'string'){
-				this._map.REMOVE_SINGLE.apply( this._map, arguments );
+				this._map.removeSingle.apply( this._map, arguments );
 			}
 			return this;
 		},
@@ -63,14 +63,14 @@ var MapFacade = (function(){
 					callback.apply( context || this._map, arguments );
 				});
 			};
-			this._map.INVOKE_MULTIPLE_CALLBACK.call( this._map, fn, context );
+			this._map.invokeMultipleCallback.call( this._map, fn, context );
 			return this;
 		},
 
 		// removes an event listener / all events from all objects in the map
 		off : function( subject ){
 			Array.prototype.unshift.call( arguments, 'off' );
-			this._map.INVOKE_MULTIPLE_METHOD.apply( this._map, arguments );
+			this._map.invokeMultipleMethod.apply( this._map, arguments );
 			return this;
 		},
 

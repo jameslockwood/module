@@ -60,42 +60,42 @@ describe("Module", function() {
 			// add in the map array manually
 			map.arrays.testObject = mapArray;
 
-			var retrievedObject = map.GET_SINGLE( 'testObject' );
+			var retrievedObject = map.getSingle( 'testObject' );
 
 			expect( retrievedObject ).toBeDefined();
 			expect( retrievedObject.test ).toBe( 'ing' );
 		});
 
 		it('Should allow single map arrays to be added', function() {
-			map.SET_SINGLE( 'test', { a : 'curlyWurly' } );
-			var obj = map.GET_SINGLE('test');
+			map.setSingle( 'test', { a : 'curlyWurly' } );
+			var obj = map.getSingle('test');
 			expect( obj.a ).toBe('curlyWurly');
 		});
 
 		it('Should allow single map arrayss to be removed', function() {
-			map.SET_SINGLE( 'test', { a : 'curlyWurly' } );
-			map.REMOVE_SINGLE( 'test' );
+			map.setSingle( 'test', { a : 'curlyWurly' } );
+			map.removeSingle( 'test' );
 
 			// object should now be undefined
 			var obj = map.arrays.test;
 			expect( obj ).toBeUndefined();
 
 			// object shouldn't be accessible and should throw error
-			var errorFn = function(){ map.GET_SINGLE( 'test'); };
+			var errorFn = function(){ map.getSingle( 'test'); };
 			expect( errorFn ).toThrow();
 		});
 
 		it('Should maintain length correctly', function() {
 			// add, remove, check length property
-			map.SET_SINGLE( 'test', { a : 'curlyWurly' } );
-			map.SET_SINGLE( 'test2', { a : 'curlyWurly' } );
+			map.setSingle( 'test', { a : 'curlyWurly' } );
+			map.setSingle( 'test2', { a : 'curlyWurly' } );
 			expect( map.length ).toBe( 2 );
-			map.REMOVE_SINGLE( 'test' );
+			map.removeSingle( 'test' );
 			expect( map.length ).toBe( 1 );
 		});
 
 		it('Should allow multiple map arrays to be added', function() {
-			map.SET_MULTIPLE({
+			map.setMultiple({
 				'test1':{ a : 'curlyWurly' },
 				'test2':{ a : 'curlyShirly' },
 				'test3':{ a : 'curlySausage' }
@@ -103,9 +103,9 @@ describe("Module", function() {
 
 			expect( map.length ).toBe( 3 );
 
-			var test1 = map.GET_SINGLE('test1'),
-				test2 = map.GET_SINGLE('test2'),
-				test3 = map.GET_SINGLE('test3');
+			var test1 = map.getSingle('test1'),
+				test2 = map.getSingle('test2'),
+				test3 = map.getSingle('test3');
 
 			expect( test1.a ).toBe('curlyWurly');
 			expect( test2.a ).toBe('curlyShirly');
@@ -113,17 +113,17 @@ describe("Module", function() {
 		});
 
 		it('Should allow multiple map arrays to be removed', function() {
-			map.SET_MULTIPLE({
+			map.setMultiple({
 				'test1':{ a : 'curlyWurly' },
 				'test2':{ a : 'curlyShirly' },
 				'test3':{ a : 'curlySausage' }
 			});
 
 			expect( map.length ).toBe( 3 );
-			map.REMOVE_MULTIPLE();
+			map.removeMultiple();
 			expect( map.length ).toBe( 0 );
 
-			var errorFn = function(){ map.GET_SINGLE('test1'); };
+			var errorFn = function(){ map.getSingle('test1'); };
 			expect( errorFn ).toThrow();
 		});
 
@@ -133,20 +133,20 @@ describe("Module", function() {
 				x = ( arg1 ? arg1 : '' ) + ( arg2 ? arg2 : '' );
 			};
 			// test for multiple args
-			map.SET_MULTIPLE({
+			map.setMultiple({
 				'test1':{
 					testMethod : method
 				}
 			});
 			expect( x ).toBe( '' );
 
-			map.INVOKE_SINGLE_METHOD( 'test1', 'testMethod' );
+			map.invokeSingleMethod( 'test1', 'testMethod' );
 			expect( x ).toBe( '' );
 
-			map.INVOKE_SINGLE_METHOD( 'test1', 'testMethod', 'hello' );
+			map.invokeSingleMethod( 'test1', 'testMethod', 'hello' );
 			expect( x ).toBe( 'hello' );
 
-			map.INVOKE_SINGLE_METHOD( 'test1', 'testMethod', 'hello', ' world' );
+			map.invokeSingleMethod( 'test1', 'testMethod', 'hello', ' world' );
 			expect( x ).toBe( 'hello world' );
 		});
 
@@ -156,7 +156,7 @@ describe("Module", function() {
 				x+= ( arg1 ? arg1 : 0 ) + ( arg2 ? arg2 : 0 );
 			};
 			// test for multiple args
-			map.SET_MULTIPLE({
+			map.setMultiple({
 				'one':{ testMethod : method },
 				'two':{ testMethod : method },
 				'three':{ testMethod : method },
@@ -165,13 +165,13 @@ describe("Module", function() {
 
 			expect( x ).toBe( 0 );
 
-			map.INVOKE_MULTIPLE_METHOD( 'testMethod' );
+			map.invokeMultipleMethod( 'testMethod' );
 			expect( x ).toBe( 0 );
 
-			map.INVOKE_MULTIPLE_METHOD( 'testMethod', 1 );
+			map.invokeMultipleMethod( 'testMethod', 1 );
 			expect( x ).toBe( 4 );
 
-			map.INVOKE_MULTIPLE_METHOD( 'testMethod', 1, 2 );
+			map.invokeMultipleMethod( 'testMethod', 1, 2 );
 			expect( x ).toBe( 16 );
 		});
 
@@ -182,11 +182,11 @@ describe("Module", function() {
 				context;
 
 			// test for multiple args and context
-			map.SET_MULTIPLE({
+			map.setMultiple({
 				'test':{ a : 1 }
 			});
 
-			map.INVOKE_SINGLE_CALLBACK( 'test', function( obj, name ){
+			map.invokeSingleCallback( 'test', function( obj, name ){
 				objRef = obj;
 				nameRef = name;
 				x = 12;
@@ -206,14 +206,14 @@ describe("Module", function() {
 				nameString = '',
 				context;
 
-			map.SET_MULTIPLE({
+			map.setMultiple({
 				'one':{ a : 2 },
 				'two':{ a : 4 },
 				'three':{ a : 6 },
 				'four':{ a : 8 }
 			});
 
-			map.INVOKE_MULTIPLE_CALLBACK( function( obj, name ){
+			map.invokeMultipleCallback( function( obj, name ){
 				nameString += name;
 				x += obj.a;
 				context = this;
@@ -252,10 +252,10 @@ describe("Module", function() {
 			map.callbacksContext = this;
 
 			// now add, get and remove
-			map.SET_MULTIPLE({
+			map.setMultiple({
 				'testObject':{ a : 2 }
 			});
-			map.REMOVE_SINGLE('testObject');
+			map.removeSingle('testObject');
 
 			// test add callback execution
 			expect( results.add.mapName ).toBe( 'testMap' );
@@ -287,10 +287,10 @@ describe("Module", function() {
 			map.callbacksContext = this;
 
 			// now add, get and remove
-			map.SET_SINGLE( 'testObject', { a : 2 } );
-			map.SET_SINGLE( 'testObject', { a : 2 } );
-			map.SET_SINGLE( 'testObject', { a : 2 } );
-			map.REMOVE_SINGLE('testObject');
+			map.setSingle( 'testObject', { a : 2 } );
+			map.setSingle( 'testObject', { a : 2 } );
+			map.setSingle( 'testObject', { a : 2 } );
+			map.removeSingle('testObject');
 
 			expect( add ).toBe( 6 );
 			expect( remove ).toBe( 6 );

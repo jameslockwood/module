@@ -99,7 +99,7 @@ var Map = (function( utils, MapFacade, MapArray ){
 		},
 
 		// gets a single map array within the map
-		GET_SINGLE : function( id ){
+		getSingle : function( id ){
 			var mapArray = this.getMapArray( id );
 			if( typeof mapArray === 'undefined' ){
 				this.errorHandler( new Error( 'Object "' + id + '" was requested but not found.') );
@@ -110,7 +110,7 @@ var Map = (function( utils, MapFacade, MapArray ){
 		},
 
 		// sets a single map array within the map
-		SET_SINGLE : function( id, obj ){
+		setSingle : function( id, obj ){
 
 			// ensure that the name is valid
 			try{
@@ -132,7 +132,7 @@ var Map = (function( utils, MapFacade, MapArray ){
 		},
 
 		// sets multiple map arrays within the map
-		SET_MULTIPLE : function( mapArrayItems ){
+		setMultiple : function( mapArrayItems ){
 			if( typeof mapArrayItems !== 'object'){
 				this.errorHandler( new Error( 'Cannot set multiple map objects - map array items argument is not an object.' ) );
 			}
@@ -144,27 +144,27 @@ var Map = (function( utils, MapFacade, MapArray ){
 					this.errorHandler( new Error( 'Map object not found - was of type ' + typeof instance ) );
 				}
 				// set each instance
-				this.SET_SINGLE( id, instance );
+				this.setSingle( id, instance );
 			}
 			return this;
 		},
 
 		// removes a single map array, or unique item from a map array
-		REMOVE_SINGLE : function( id, optionalMapArrayItemId ){
+		removeSingle : function( id, optionalMapArrayItemId ){
 			this.removeMapArray( id, optionalMapArrayItemId );
 			return this;
 		},
 
 		// removes all map arrays within the map
-		REMOVE_MULTIPLE : function(){
+		removeMultiple : function(){
 			for( var id in this.arrays ){
-				this.REMOVE_SINGLE( id );
+				this.removeSingle( id );
 			}
 			return this;
 		},
 
 		// calls a method on a single map array within the map.
-		INVOKE_SINGLE_METHOD : function( id, method, arg1, arg2, argN ){
+		invokeSingleMethod : function( id, method, arg1, arg2, argN ){
 			var originalArgs = Array.prototype.slice.call( arguments, 0 );
 			var mapArray = this.getMapArray( id );
 			try {
@@ -183,7 +183,7 @@ var Map = (function( utils, MapFacade, MapArray ){
 		},
 
 		// same as above but no error if the method doesn't exist within the map array.
-		INVOKE_SINGLE_METHOD_IF_EXISTS : function( id, method, arg1, arg2, argN ){
+		invokeSingleMethodIfExists : function( id, method, arg1, arg2, argN ){
 			var originalArgs = Array.prototype.slice.call( arguments, 0 );
 			var mapArray = this.getMapArray( id );
 			mapArray.each( function( item ){
@@ -195,7 +195,7 @@ var Map = (function( utils, MapFacade, MapArray ){
 		},
 
 		// gets a single map array within the map, and then injects its contents into a callback
-		INVOKE_SINGLE_CALLBACK : function( id, callback, context ){
+		invokeSingleCallback : function( id, callback, context ){
 			var mapArray = this.getMapArray( id );
 			mapArray.each( function( item ){
 				try {
@@ -211,29 +211,29 @@ var Map = (function( utils, MapFacade, MapArray ){
 		},
 
 		// each map array in the map injects its contents into the callback
-		INVOKE_MULTIPLE_CALLBACK : function( callback, context ){
+		invokeMultipleCallback : function( callback, context ){
 			for( var id in this.arrays ){
-				this.INVOKE_SINGLE_CALLBACK( id, callback, context );
+				this.invokeSingleCallback( id, callback, context );
 			}
 			return this;
 		},
 
 		// calls a defined method on each map array's contents within the map
-		INVOKE_MULTIPLE_METHOD : function( method, arg1, arg2, argN ){
+		invokeMultipleMethod : function( method, arg1, arg2, argN ){
 			for( var id in this.arrays ){
 				var args = Array.prototype.slice.call( arguments, 0 );
 				Array.prototype.unshift.call( args, id );
-				this.INVOKE_SINGLE_METHOD.apply( this, args );
+				this.invokeSingleMethod.apply( this, args );
 			}
 			return this;
 		},
 
 		// calls a method on each map array's contents in the map, if the method exists.
-		INVOKE_MULTIPLE_METHOD_IF_EXISTS : function( method, arg1, arg2, argN ){
+		invokeMultipleMethodIfExists : function( method, arg1, arg2, argN ){
 			for( var id in this.arrays ){
 				var args = Array.prototype.slice.call( arguments, 0 );
 				Array.prototype.unshift.call( args, id );
-				this.INVOKE_SINGLE_METHOD_IF_EXISTS.apply( this, args );
+				this.invokeSingleMethodIfExists.apply( this, args );
 			}
 			return this;
 		}
