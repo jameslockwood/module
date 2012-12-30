@@ -1,7 +1,7 @@
 {
   "name": "module",
   "description": "Lightweight library to create modular JavaScript applications",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "homepage": "https://github.com/jameslockwood/module",
   "author": {
     "name": "James Lockwood",
@@ -30,5 +30,5 @@
   "devDependencies": {
     "grunt": "~0.3.17"
   },
-  "keywords": []
+  "keywords": ["module","modular","widget","modulejs"]
 }
