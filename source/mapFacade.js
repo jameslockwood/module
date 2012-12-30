@@ -1,7 +1,9 @@
 
 var MapFacade = (function(){
 
-	// The sandboxed literal that is returned when a map is created.
+	// Abstracts away from the Map constructor.
+	// This facade is returned when a map is instantiated.
+
 	function MapFacade( map ){
 		this._map = map;
 	}

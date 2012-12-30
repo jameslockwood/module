@@ -1,4 +1,4 @@
-describe("Core.Module", function() {
+describe("Module", function() {
 
 	describe('Map.checkName', function(){
 
@@ -50,15 +50,15 @@ describe("Core.Module", function() {
 			expect( map.getName() ).toBe( 'testMap' );
 		});
 
-		it('Should allow mappings to be retrieved', function() {
+		it('Should allow map array to be retrieved', function() {
 			var testItem = {
 				test : 'ing'
 			};
-			var mapping = new Mapping();
-			mapping.add( testItem );
+			var mapArray = new MapArray();
+			mapArray.add( testItem );
 
-			// add in the mapping manually
-			map.map.testObject = mapping;
+			// add in the map array manually
+			map.arrays.testObject = mapArray;
 
 			var retrievedObject = map.GET_SINGLE( 'testObject' );
 
@@ -66,18 +66,18 @@ describe("Core.Module", function() {
 			expect( retrievedObject.test ).toBe( 'ing' );
 		});
 
-		it('Should allow single mappings to be added', function() {
+		it('Should allow single map arrays to be added', function() {
 			map.SET_SINGLE( 'test', { a : 'curlyWurly' } );
 			var obj = map.GET_SINGLE('test');
 			expect( obj.a ).toBe('curlyWurly');
 		});
 
-		it('Should allow single mappings to be removed', function() {
+		it('Should allow single map arrayss to be removed', function() {
 			map.SET_SINGLE( 'test', { a : 'curlyWurly' } );
 			map.REMOVE_SINGLE( 'test' );
 
 			// object should now be undefined
-			var obj = map.map.test;
+			var obj = map.arrays.test;
 			expect( obj ).toBeUndefined();
 
 			// object shouldn't be accessible and should throw error
@@ -94,7 +94,7 @@ describe("Core.Module", function() {
 			expect( map.length ).toBe( 1 );
 		});
 
-		it('Should allow multiple mappings to be added', function() {
+		it('Should allow multiple map arrays to be added', function() {
 			map.SET_MULTIPLE({
 				'test1':{ a : 'curlyWurly' },
 				'test2':{ a : 'curlyShirly' },
@@ -112,7 +112,7 @@ describe("Core.Module", function() {
 			expect( test3.a ).toBe('curlySausage');
 		});
 
-		it('Should allow multiple mappings to be removed', function() {
+		it('Should allow multiple map arrays to be removed', function() {
 			map.SET_MULTIPLE({
 				'test1':{ a : 'curlyWurly' },
 				'test2':{ a : 'curlyShirly' },
@@ -127,7 +127,7 @@ describe("Core.Module", function() {
 			expect( errorFn ).toThrow();
 		});
 
-		it('Should allow methods to be invoked on a single mapping', function() {
+		it('Should allow methods to be invoked on a single map array', function() {
 			var x = '';
 			var method = function( arg1, arg2 ){
 				x = ( arg1 ? arg1 : '' ) + ( arg2 ? arg2 : '' );
@@ -150,7 +150,7 @@ describe("Core.Module", function() {
 			expect( x ).toBe( 'hello world' );
 		});
 
-		it('Should allow methods to be invoked on multiple mappings', function() {
+		it('Should allow methods to be invoked on multiple map arrays', function() {
 			var x = 0;
 			var method = function( arg1, arg2 ){
 				x+= ( arg1 ? arg1 : 0 ) + ( arg2 ? arg2 : 0 );
@@ -175,7 +175,7 @@ describe("Core.Module", function() {
 			expect( x ).toBe( 16 );
 		});
 
-		it('Should allow callbacks to be invoked on a single mapping', function() {
+		it('Should allow callbacks to be invoked on a single map array', function() {
 			var x = 0,
 				nameRef = '',
 				objRef = {},
@@ -200,7 +200,7 @@ describe("Core.Module", function() {
 
 		});
 
-		it('Should allow callbacks to be invoked on multiple mappings', function() {
+		it('Should allow callbacks to be invoked on multiple map arrays', function() {
 
 			var x = 0,
 				nameString = '',
@@ -269,7 +269,7 @@ describe("Core.Module", function() {
 
 		});
 
-		it('Should correctly fire events on add / remove for a mapping containing many objects', function() {
+		it('Should correctly fire events on add / remove for a map array containing many objects', function() {
 			
 			var add = 0;
 			var remove = 0;

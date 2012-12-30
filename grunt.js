@@ -8,7 +8,7 @@ module.exports = function(grunt) {
 		},
 		concat: {
 			dist: {
-				src: ['<banner:meta.banner>', 'source/wrapper/top.js' , 'source/utils.js', 'source/mapFacade.js', 'source/mapping.js', 'source/map.js', 'source/module.js', 'source/wrapper/bottom.js'],
+				src: ['<banner:meta.banner>', 'source/wrapper/top.js' , 'source/utils.js', 'source/mapFacade.js', 'source/mapArray.js', 'source/map.js', 'source/module.js', 'source/wrapper/bottom.js'],
 				dest: '<%= pkg.name %>.js'
 			}
 		},

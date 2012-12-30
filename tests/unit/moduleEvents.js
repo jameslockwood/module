@@ -1,4 +1,4 @@
-describe("Core Module", function() {
+describe("Module", function() {
 
 	describe("Events", function() {
 
@@ -317,7 +317,7 @@ describe("Core Module", function() {
 			expect( x ).toBe( 20 );
 		});
 
-		it('Should unbind all event listeners on mapping remove', function() {
+		it('Should unbind all event listeners on map array remove', function() {
 
 			var multiple = 0,
 				single = 0;
@@ -369,7 +369,7 @@ describe("Core Module", function() {
 		});
 
 
-		it('Should bind to multiple objects within a mapping', function() {
+		it('Should bind to multiple objects within a map array', function() {
 
 			var multiple = 0,
 				single = 0;
@@ -394,12 +394,12 @@ describe("Core Module", function() {
 
 			var cars = module.cars = module.createMap('cars');
 
-			// add three objects within the 'ferrari' mapping
+			// add three objects within the 'ferrari' map array
 			cars.add('ferrari',{});
 			cars.add('ferrari',{});
 			cars.add('ferrari',{});
 
-			// each object within the ferrari mapping should emit
+			// each object within the ferrari map array should emit
 			cars.each('emit','crash');
 			expect( single ).toBe( 6 );
 			expect( multiple ).toBe( 6 );

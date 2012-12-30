@@ -294,7 +294,9 @@ var utils = (function(utils) {
 
 var MapFacade = (function(){
 
-	// The sandboxed literal that is returned when a map is created.
+	// Abstracts away from the Map constructor.
+	// This facade is returned when a map is instantiated.
+
 	function MapFacade( map ){
 		this._map = map;
 	}
@@ -376,20 +378,24 @@ var MapFacade = (function(){
 })();
 
 
-var Mapping = (function(){
+var MapArray = (function(){
 
-	function Mapping(){
+	// A map array is stored within a map ( with an associative value )
+	// Each map array can contain one to many items.
+	// Each item within the map array has it's own identifier.
+	
+	function MapArray(){
 		this._items = [];
 		this.count = 0;
 	}
 
-	Mapping.prototype = {
+	MapArray.prototype = {
 
-		// add an item to the mapping
+		// add an item to the map array
 		add : function( obj, success, context ){
 			// increment the count, set unique id, then add to the items array
 			this.count++;
-			obj._mappingId = this.count;
+			obj._mapArrayId = this.count;
 			this._items.push( obj );
 
 			if( typeof success === 'function' ){
@@ -398,7 +404,7 @@ var Mapping = (function(){
 			return this;
 		},
 
-		// remove an item from the mapping
+		// remove an item from the map array
 		remove : function( itemId, success, context ){
 
 			var callSuccess = function( item ){
@@ -408,7 +414,7 @@ var Mapping = (function(){
 			};
 			
 			this.each( function( item, arrayIndex ){
-				if( itemId && item._mappingId === itemId ){
+				if( itemId && item._mapArrayId === itemId ){
 					// an item id has been passed in - try to remove a unique item
 					this._items.splice( arrayIndex, 1 );
 					callSuccess( item );
@@ -435,21 +441,21 @@ var Mapping = (function(){
 			}
 		},
 
-		// returns all of the items within the mapping
+		// returns all of the items within the map array
 		getItems : function(){
 			return this._items;
 		}
 
 	};
 
-	return Mapping;
+	return MapArray;
 
 })();
 
 
-var Map = (function( utils, MapFacade, Mapping ){
+var Map = (function( utils, MapFacade, MapArray ){
 
-	// Map object that stores multiple mappings.
+	// Map object that stores multiple map arrays.
 	function Map( name, config ){
 
 		config = ( typeof config == 'object' ? config : {} );
@@ -463,8 +469,8 @@ var Map = (function( utils, MapFacade, Mapping ){
 		// each map is given it's own name to aid recognition and error formatting.
 		this.name = name;
 
-		// where we store all objects within the map.
-		this.map = {};
+		// where we store all arrays within the map.  Each array has a unique key.
+		this.arrays = {};
 
 		// any matching event callbacks (get/add/remove) are called when appropriate
 		this.eventCallbacks = config.callbacks || {};
@@ -493,7 +499,7 @@ var Map = (function( utils, MapFacade, Mapping ){
 			return name ? ' object [inside \'' + name + '\' map]' : ' object [inside anonymous map]';
 		},
 
-		// checks that a supplied map name is valid
+		// checks that a supplied name is valid
 		checkName : function( name, map ){
 			// ensure that we've been provided a correct name
 			if( typeof name !== 'string' && typeof name !== 'number' ){
@@ -511,50 +517,53 @@ var Map = (function( utils, MapFacade, Mapping ){
 			}
 		},
 
-		addToMapping : function( id, obj ){
-			var mapping = this.getMapping( id );
-			if ( typeof mapping === 'undefined' ){
-				mapping = this.map[id] = new Mapping();
+		// adds an object to a map array instance
+		addToMapArray : function( id, obj ){
+			var mapArray = this.getMapArray( id );
+			if ( typeof mapArray === 'undefined' ){
+				mapArray = this.arrays[id] = new MapArray();
 			}
-			// add mapping, supplying on success callback
-			mapping.add( obj, function( item ){
+			// add map array, supplying on success callback
+			mapArray.add( obj, function( item ){
 				this.length++;
 				this.fireEvent( 'add', id, item );
 			}, this );
 		},
 
-		removeMapping : function( id ){
-			var mapping = this.getMapping( id );
+		// removes a whole map array instance
+		removeMapArray : function( id ){
+			var mapArray = this.getMapArray( id );
 
-			// remove mapping, supplying on success callback
-			mapping.remove( undefined, function( item ){
+			// remove map array, supplying on success callback
+			mapArray.remove( undefined, function( item ){
 				this.length--;
 				this.fireEvent( 'remove', id, item );
-				delete this.map[id];
+				delete this.arrays[id];
 			}, this );
 		},
 
-		removeMappingItem : function( id, mappingItemId ){
-			var mapping = this.getMapping( id );
-			mapping.remove( mappingItemId );
+		// removes a specific object from a map array instance
+		removeMapArrayItem : function( id, mapArrayItemId ){
+			var mapArray = this.getMapArray( id );
+			mapArray.remove( mapArrayItemId );
 		},
 
-		getMapping : function( id ){
-			return this.map[ id ];
+		getMapArray : function( id ){
+			return this.arrays[ id ];
 		},
 
-		// gets a single object within the map
+		// gets a single map array within the map
 		GET_SINGLE : function( id ){
-			var mapping = this.getMapping( id );
-			if( typeof mapping === 'undefined' ){
+			var mapArray = this.getMapArray( id );
+			if( typeof mapArray === 'undefined' ){
 				this.errorHandler( new Error( 'Object "' + id + '" was requested but not found.') );
 			}
-			var items = mapping.getItems();
+			var items = mapArray.getItems();
 			// if multiple items, return array
 			return ( items.length == 1 ? items[0] : items );
 		},
 
-		// sets a single object within the map
+		// sets a single map array within the map
 		SET_SINGLE : function( id, obj ){
 
 			// ensure that the name is valid
@@ -570,21 +579,21 @@ var Map = (function( utils, MapFacade, Mapping ){
 				utils.installEventsTo( obj );
 			}
 
-			// store the object into the mapping array
-			this.addToMapping( id, obj );
+			// store the object into the map array
+			this.addToMapArray( id, obj );
 
 			return obj;
 		},
 
-		// sets a single object within the map
-		SET_MULTIPLE : function( mappingItems ){
-			if( typeof mappingItems !== 'object'){
-				this.errorHandler( new Error( 'Cannot set multiple map objects - mapping items argument is not an object.' ) );
+		// sets multiple map arrays within the map
+		SET_MULTIPLE : function( mapArrayItems ){
+			if( typeof mapArrayItems !== 'object'){
+				this.errorHandler( new Error( 'Cannot set multiple map objects - map array items argument is not an object.' ) );
 			}
 			// for each object passed through
-			for( var i in mappingItems ){
+			for( var i in mapArrayItems ){
 				var id = i,
-					instance = mappingItems[i];
+					instance = mapArrayItems[i];
 				if( typeof instance != 'object' ){
 					this.errorHandler( new Error( 'Map object not found - was of type ' + typeof instance ) );
 				}
@@ -594,26 +603,26 @@ var Map = (function( utils, MapFacade, Mapping ){
 			return this;
 		},
 
-		// removes a single object within the map
-		REMOVE_SINGLE : function( id, optionalMappingItemId ){
-			this.removeMapping( id, optionalMappingItemId );
+		// removes a single map array, or unique item from a map array
+		REMOVE_SINGLE : function( id, optionalMapArrayItemId ){
+			this.removeMapArray( id, optionalMapArrayItemId );
 			return this;
 		},
 
-		// removes all objects within the map
+		// removes all map arrays within the map
 		REMOVE_MULTIPLE : function(){
-			for( var id in this.map ){
+			for( var id in this.arrays ){
 				this.REMOVE_SINGLE( id );
 			}
 			return this;
 		},
 
-		// calls a method on a single object within the map.
+		// calls a method on a single map array within the map.
 		INVOKE_SINGLE_METHOD : function( id, method, arg1, arg2, argN ){
 			var originalArgs = Array.prototype.slice.call( arguments, 0 );
-			var mapping = this.getMapping( id );
+			var mapArray = this.getMapArray( id );
 			try {
-				mapping.each( function( item ){
+				mapArray.each( function( item ){
 					if( typeof item[method] == 'function' ){
 						var args = originalArgs.slice( 2 );
 						return item[method].apply( item, args );
@@ -627,11 +636,11 @@ var Map = (function( utils, MapFacade, Mapping ){
 			}
 		},
 
-		// same as above but no error if the method doesn't exist on the object.
+		// same as above but no error if the method doesn't exist within the map array.
 		INVOKE_SINGLE_METHOD_IF_EXISTS : function( id, method, arg1, arg2, argN ){
 			var originalArgs = Array.prototype.slice.call( arguments, 0 );
-			var mapping = this.getMapping( id );
-			mapping.each( function( item ){
+			var mapArray = this.getMapArray( id );
+			mapArray.each( function( item ){
 				if ( typeof item[method] == 'function' ){
 					var args = originalArgs.slice( 2 );
 					return item[method].apply( item, args );
@@ -639,10 +648,10 @@ var Map = (function( utils, MapFacade, Mapping ){
 			}, this);
 		},
 
-		// gets a single object within the map and then injects it into a callback
+		// gets a single map array within the map, and then injects its contents into a callback
 		INVOKE_SINGLE_CALLBACK : function( id, callback, context ){
-			var mapping = this.getMapping( id );
-			mapping.each( function( item ){
+			var mapArray = this.getMapArray( id );
+			mapArray.each( function( item ){
 				try {
 					return callback.call( context || item, item, id );
 				} catch (e){
@@ -655,17 +664,17 @@ var Map = (function( utils, MapFacade, Mapping ){
 			});
 		},
 
-		// each object in the map is injected into the callback
+		// each map array in the map injects its contents into the callback
 		INVOKE_MULTIPLE_CALLBACK : function( callback, context ){
-			for( var id in this.map ){
+			for( var id in this.arrays ){
 				this.INVOKE_SINGLE_CALLBACK( id, callback, context );
 			}
 			return this;
 		},
 
-		// calls a defined method on each object within the map
+		// calls a defined method on each map array's contents within the map
 		INVOKE_MULTIPLE_METHOD : function( method, arg1, arg2, argN ){
-			for( var id in this.map ){
+			for( var id in this.arrays ){
 				var args = Array.prototype.slice.call( arguments, 0 );
 				Array.prototype.unshift.call( args, id );
 				this.INVOKE_SINGLE_METHOD.apply( this, args );
@@ -673,9 +682,9 @@ var Map = (function( utils, MapFacade, Mapping ){
 			return this;
 		},
 
-		// calls a method on each object in the map if the method exists.
+		// calls a method on each map array's contents in the map, if the method exists.
 		INVOKE_MULTIPLE_METHOD_IF_EXISTS : function( method, arg1, arg2, argN ){
-			for( var id in this.map ){
+			for( var id in this.arrays ){
 				var args = Array.prototype.slice.call( arguments, 0 );
 				Array.prototype.unshift.call( args, id );
 				this.INVOKE_SINGLE_METHOD_IF_EXISTS.apply( this, args );
@@ -686,7 +695,7 @@ var Map = (function( utils, MapFacade, Mapping ){
 
 	return Map;
 
-})( utils, MapFacade, Mapping );
+})( utils, MapFacade, MapArray );
 
 var Module = ( function( utils, Map, MapFacade ){
 

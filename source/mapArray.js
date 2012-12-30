@@ -1,18 +1,22 @@
 
-var Mapping = (function(){
+var MapArray = (function(){
 
-	function Mapping(){
+	// A map array is stored within a map ( with an associative value )
+	// Each map array can contain one to many items.
+	// Each item within the map array has it's own identifier.
+	
+	function MapArray(){
 		this._items = [];
 		this.count = 0;
 	}
 
-	Mapping.prototype = {
+	MapArray.prototype = {
 
-		// add an item to the mapping
+		// add an item to the map array
 		add : function( obj, success, context ){
 			// increment the count, set unique id, then add to the items array
 			this.count++;
-			obj._mappingId = this.count;
+			obj._mapArrayId = this.count;
 			this._items.push( obj );
 
 			if( typeof success === 'function' ){
@@ -21,7 +25,7 @@ var Mapping = (function(){
 			return this;
 		},
 
-		// remove an item from the mapping
+		// remove an item from the map array
 		remove : function( itemId, success, context ){
 
 			var callSuccess = function( item ){
@@ -31,7 +35,7 @@ var Mapping = (function(){
 			};
 			
 			this.each( function( item, arrayIndex ){
-				if( itemId && item._mappingId === itemId ){
+				if( itemId && item._mapArrayId === itemId ){
 					// an item id has been passed in - try to remove a unique item
 					this._items.splice( arrayIndex, 1 );
 					callSuccess( item );
@@ -58,13 +62,13 @@ var Mapping = (function(){
 			}
 		},
 
-		// returns all of the items within the mapping
+		// returns all of the items within the map array
 		getItems : function(){
 			return this._items;
 		}
 
 	};
 
-	return Mapping;
+	return MapArray;
 
 })();
