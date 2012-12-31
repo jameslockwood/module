@@ -384,18 +384,22 @@ var MapArray = (function(){
 	// Each map array can contain one to many items.
 	// Each item within the map array has it's own identifier.
 	
+	// stores number of instances that have been created.  used for uids.
+	var instanceCount = 0;
+
 	function MapArray(){
 		this._items = [];
-		this.count = 0;
 	}
 
 	MapArray.prototype = {
 
+		count : 0,
+
 		// add an item to the map array
 		add : function( obj, success, context ){
 			// increment the count, set unique id, then add to the items array
-			this.count++;
-			obj._mapArrayId = this.count;
+			instanceCount++;
+			obj._mapArrayId = instanceCount;
 			this._items.push( obj );
 
 			if( typeof success === 'function' ){

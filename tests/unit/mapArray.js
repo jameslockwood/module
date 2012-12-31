@@ -25,9 +25,11 @@ describe("Module", function() {
 		it('Should assign iterative unique IDs properly', function(){
 			mapArray.add({}).add({});
 
+			var firstId = mapArray.getItems()[0]._mapArrayId;
+			var secondId = mapArray.getItems()[1]._mapArrayId;
+			var difference = secondId - firstId;
 			// check mapArray ID's are iterating properlt
-			expect( mapArray.getItems()[0]._mapArrayId ).toBe( 1 );
-			expect( mapArray.getItems()[1]._mapArrayId ).toBe( 2 );
+			expect( difference ).toBe( 1 );
 		});
 
 		it('Should allow all items to be removed', function(){
