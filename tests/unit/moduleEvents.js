@@ -137,7 +137,7 @@ describe("Module", function() {
 				module._processEventsSelector();
 
 				module.dog = {};
-				utils.installEventsTo( module.dog );
+				Module.installEventsTo( module.dog );
 				module.bindEvents();
 
 				// force the property to emit an event
@@ -197,7 +197,7 @@ describe("Module", function() {
 
 				// now create our property with its own events aggregator that we wish to bind to
 				module.dog = {};
-				utils.installEventsTo( module.dog );
+				Module.installEventsTo( module.dog );
 
 				// now bind the property with any declarations in our events selector
 				module._bindProperty( 'on', 'dog', module.dog );
@@ -235,7 +235,7 @@ describe("Module", function() {
 				module._processEventsSelector();
 
 				module.dog = {};
-				utils.installEventsTo( module.dog );
+				Module.installEventsTo( module.dog );
 				module.bindEvents();
 
 				// force the property to emit an event
@@ -304,7 +304,7 @@ describe("Module", function() {
 			cars.add('ford', {});
 
 			var view = {};
-			utils.installEventsTo( view );
+			Module.installEventsTo( view );
 			testModule.view = view;
 			testModule.bindEvents();
 

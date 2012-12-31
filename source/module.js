@@ -28,6 +28,11 @@ var Module = ( function( utils, Map, MapFacade ){
 	// allows constructor to be extended
 	Module.extend = utils.extend;
 
+	// adds an events aggregator onto an object
+	Module.installEventsTo = function( target ){
+		utils.installEventsTo( target );
+	};
+
 	Module.prototype = {
 
 		// base inititialize - always called to set up object properties.

@@ -1,4 +1,4 @@
-/*! module - v0.2.0 - 2012-12-30
+/*! module - v0.2.0 - 2012-12-31
 * https://github.com/jameslockwood/module
 * Copyright (c) 2012 James Lockwood; Licensed MIT */
 
@@ -738,6 +738,11 @@ var Module = ( function( utils, Map, MapFacade ){
 
 	// allows constructor to be extended
 	Module.extend = utils.extend;
+
+	// adds an events aggregator onto an object
+	Module.installEventsTo = function( target ){
+		utils.installEventsTo( target );
+	};
 
 	Module.prototype = {
 
