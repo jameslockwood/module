@@ -27,8 +27,11 @@
   },
   "scripts": {
   },
+  "dependencies": {
+  },
   "devDependencies": {
-    "grunt": "~0.3.17"
+    "grunt": "~0.3.17",
+    "testacular": "*"
   },
   "keywords": ["module","modular","widget","modulejs"]
 }
