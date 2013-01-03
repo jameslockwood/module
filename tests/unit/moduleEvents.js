@@ -281,11 +281,13 @@ describe("Module", function() {
 				var ford = {};
 				Module.installEventsTo( ford );
 
+				// bind the object then emit a crash event. Test values should change.
 				module._bindMapObject('on', 'vehicles', 'ford', ford);
 				ford.emit('crash');
 				expect( single ).toBe( 2 );
 				expect( multiple ).toBe( 2 );
 
+				// unbind the crash event then emit again.  Test values should not change.
 				module._bindMapObject('off', 'vehicles', 'ford', ford);
 				ford.emit('crash');
 				expect( single ).toBe( 2 );
@@ -307,19 +309,24 @@ describe("Module", function() {
 				x+=10;
 			});
 
+			// add a map that should bind automatically with events
 			var cars = testModule.cars = testModule.createMap('cars');
 			cars.add('ford', {});
 
+			// add an object literal that we need to manually bind via bindEvents
 			var view = {};
 			Module.installEventsTo( view );
 			testModule.view = view;
 			testModule.bindEvents();
 
+			// start the tests
 			expect( x ).toBe( 0 );
 
+			// test that object literal can propagate events up
 			testModule.view.emit('test');
 			expect( x ).toBe( 10 );
 
+			// test that our map can propagate events up
 			testModule.cars.get('ford').emit('test');
 			expect( x ).toBe( 20 );
 		});
