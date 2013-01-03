@@ -1,7 +1,7 @@
 {
   "name": "module",
   "description": "Lightweight library to create modular JavaScript applications",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "homepage": "https://github.com/jameslockwood/module",
   "author": {
     "name": "James Lockwood",

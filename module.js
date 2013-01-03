@@ -1,4 +1,4 @@
-/*! module - v0.2.0 - 2013-01-03
+/*! module - v0.2.1 - 2013-01-03
 * https://github.com/jameslockwood/module
 * Copyright (c) 2013 James Lockwood; Licensed MIT */
 
