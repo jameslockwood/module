@@ -21,7 +21,6 @@
       "url": "https://github.com/jameslockwood/module/blob/master/LICENSE-MIT"
     }
   ],
-  "main": "lib/module",
   "engines": {
     "node": "*"
   },
