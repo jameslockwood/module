@@ -154,7 +154,7 @@ var Module = ( function( utils, Map, MapFacade ){
 					var store = this._.eventsGroupCallbacks = ( this._.eventsGroupCallbacks || {} );
 					var root = this;
 					// Create a unique key for each callback.
-					var cbKey = key + objName + event;
+					var cbKey = key + '-' + objName + '-' + event;
 
 					// Store the altered function if it doesn't already exist.
 					if( !store[cbKey] ){
