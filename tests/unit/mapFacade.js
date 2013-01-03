@@ -105,8 +105,11 @@ describe("MapFacade", function() {
 				'third' : {}
 			});
 
+			var iterate = function(){
+				map.eachTry('test', 5, 5 );
+			};
 			expect( x ).toBe( 0 );
-			map.eachTry('test', 5, 5 );
+			expect( iterate ).not.toThrow();
 			expect( x ).toBe( 50 );
 
 		});
