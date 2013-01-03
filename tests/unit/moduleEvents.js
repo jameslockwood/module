@@ -178,17 +178,22 @@ describe("Module", function() {
 		describe('bindProperty', function(){
 			it('Should bind a property to an event', function() {
 				var x = 0;
+				var singleTestResult = '';
+				var multiTestResult = '';
+
 				// create our events selector
 				module.events = {
 					// single declaration
-					'dog woof' : function(){
+					'dog woof' : function( test ){
 						x += 10;
+						singleTestResult = test;
 					},
 
 					// multi declaration
 					'dog' : {
-						woof : function(){
+						woof : function( test ){
 							x += 10;
+							multiTestResult = test;
 						}
 					}
 				};
@@ -207,9 +212,11 @@ describe("Module", function() {
 				module._bindProperty( 'on', 'dog', module.dog );
 
 				// force the property to emit an event
-				module.dog.emit('woof');
+				module.dog.emit('woof', 'bobby');
 
 				expect(x).toBe(20);
+				expect(singleTestResult).toBe('bobby');
+				expect(multiTestResult).toBe('bobby');
 
 			});
 		});
@@ -252,37 +259,39 @@ describe("Module", function() {
 				var multiple = 0,
 					single = 0;
 
-				var cars = module.cars = module.createMap('cars');
-				cars.add('ford', {});
-
 				module.events = {
 					// single object binds to single event declaration
-					'cars.ford crash' : function(){ single++; },
+					'vehicles.ford crash' : function(){ single++; },
 
 					// single object binds to multi event declarations
-					'cars.ford' : {
+					'vehicles.ford' : {
 						'crash' : function(){ single++; }
 					},
 
 					// multi objects binds to single event declaration
-					'cars crash' : function(){ multiple++; },
+					'vehicles crash' : function(){ multiple++; },
 
 					// multi objects bind to multi event declarations
-					'cars' : {
+					'vehicles' : {
 						'crash' : function(){ multiple++; }
 					}
 				};
 				module._processEventsSelector();
 
-				module._bindMapObject( 'on', 'cars', 'ford', cars.get('ford') );
-				cars.get('ford').emit('crash');
+				var ford = {};
+				Module.installEventsTo( ford );
+
+				// bind the object then emit a crash event. Test values should change.
+				module._bindMapObject('on', 'vehicles', 'ford', ford);
+				ford.emit('crash');
 				expect( single ).toBe( 2 );
 				expect( multiple ).toBe( 2 );
 
-				module._bindMapObject( 'off', 'cars', 'ford', cars.get('ford') );
-				cars.get('ford').emit('crash');
+				// unbind the crash event then emit again.  Test values should not change.
+				module._bindMapObject('off', 'vehicles', 'ford', ford);
+				ford.emit('crash');
 				expect( single ).toBe( 2 );
-				expect( multiple ).toBe( 4 );
+				expect( multiple ).toBe( 2 );
 
 			});
 		});
@@ -300,19 +309,24 @@ describe("Module", function() {
 				x+=10;
 			});
 
+			// add a map that should bind automatically with events
 			var cars = testModule.cars = testModule.createMap('cars');
 			cars.add('ford', {});
 
+			// add an object literal that we need to manually bind via bindEvents
 			var view = {};
 			Module.installEventsTo( view );
 			testModule.view = view;
 			testModule.bindEvents();
 
+			// start the tests
 			expect( x ).toBe( 0 );
 
+			// test that object literal can propagate events up
 			testModule.view.emit('test');
 			expect( x ).toBe( 10 );
 
+			// test that our map can propagate events up
 			testModule.cars.get('ford').emit('test');
 			expect( x ).toBe( 20 );
 		});
