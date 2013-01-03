@@ -136,21 +136,38 @@ var Module = ( function( utils, Map, MapFacade ){
 			// check for direct references
 			this._bindProperty( onOff, mapName + '.' + objectName, object );
 			// check for map references
-			this._bindProperty( onOff, mapName, object, { name : objectName } );
+			this._bindProperty( onOff, mapName, object, objectName );
 		},
 
 		// Takes a property then binds/unbinds to any matching events.
-		_bindProperty : function( onOff, key, object, forceArgs ){
+		_bindProperty : function( onOff, key, object, objName ){
 
 			// creates a callback, injecting additional arguments if required.
-			var makeCallBack = function( fn ){
-				if( typeof forceArgs !== 'undefined' ){
-					// force object and Id to be passed into the event callback.
-					return function(){
-						Array.prototype.unshift.call( arguments, object, forceArgs.name );
-						return fn.apply( this, arguments );
-					};
+			var makeCallBack = function( fn, event ){
+				
+				if( typeof objName !== 'undefined' ){
+					// We need to inject the object and it's id/name into the event callback
+					// To do this we'll create an anonymous function, which will screw up
+					// unbinding, so we need to store it on the object so we can unbind properly.
+
+					// Identify where we're going to store all callbacks;
+					var store = this._.eventsGroupCallbacks = ( this._.eventsGroupCallbacks || {} );
+					var root = this;
+					// Create a unique key for each callback.
+					var cbKey = key + '-' + objName + '-' + event;
+
+					// Store the altered function if it doesn't already exist.
+					if( !store[cbKey] ){
+						store[cbKey] = function(){
+							// force object and Id to be passed into the event callback.
+							Array.prototype.unshift.call( arguments, object, objName );
+							return fn.apply( null, arguments );
+						};
+					}
+					// Now return the modified callback.
+					return store[cbKey];
 				} else {
+					// We don't need to inject any more params, so just return the original callback.
 					return fn;
 				}
 			};
@@ -161,13 +178,12 @@ var Module = ( function( utils, Map, MapFacade ){
 					// get array of event handlers associated with that event
 					var callbacks = handlersObject[event];
 					for ( var i in callbacks ){
-
 						// for each callback, bind it to the object in question
-						var callback = makeCallBack( callbacks[i] );
+						var callback = makeCallBack.call( this, callbacks[i], event );
 						if( typeof object[onOff] !== 'function' ){
 							this.throwException( new Error("Failed hooking up '" + event + "' event on '" + key + "' object as it has no " + onOff + "() method - No event aggregator is present on " + key + ".") );
 						}
-						object[onOff].call( object, event, callback, this );
+						object[onOff].call( object, event, callback );
 					}
 				}
 			};
@@ -177,8 +193,8 @@ var Module = ( function( utils, Map, MapFacade ){
 			// set bindings against this
 			setBindings.call( this, eventHandlers );
 
-			// set global handlers
-			if( typeof forceArgs !== 'undefined' ){
+			// set any global handlers (i.e. any event handlers within a '*' rule.)
+			if( typeof objName !== 'undefined' ){
 				var globalEventHandlers = this._getGlobalEventHandlers();
 				setBindings.call( this, globalEventHandlers );
 			}
@@ -244,10 +260,17 @@ var Module = ( function( utils, Map, MapFacade ){
 			// take into account any .* declarations
 			key = key.split('.*')[0];
 
+			// close context around our callback
+			var root = this;
+			var closedCallback = function(){
+				callback.apply( root, arguments );
+			};
+
+			// now register the event and callback
 			var events = this._.eventsMap = ( this._.eventsMap ? this._.eventsMap : {} );
 			events[key] = ( typeof events[key] == 'undefined' ? {} : events[key] );
 			events[key][event] = ( typeof events[key][event] == 'undefined' ? [] : events[key][event] );
-			events[key][event].push( callback );
+			events[key][event].push( closedCallback );
 		},
 
 		// returns an object containing arrays of event handlers associated with supplied key/event pair
@@ -266,6 +289,7 @@ var Module = ( function( utils, Map, MapFacade ){
 			return handlers;
 		},
 
+		// returns any event handlers that have a '*' catch-all rule
 		_getGlobalEventHandlers : function(){
 			var events = this._.eventsMap = ( this._.eventsMap ? this._.eventsMap : {} );
 			return ( events['*'] ? events['*'] : {} );
@@ -292,8 +316,8 @@ var Module = ( function( utils, Map, MapFacade ){
 			var blacklist = this._.eventsBlacklist;
 			for( var i in this ){
 				if( this.hasOwnProperty(i) && typeof this[i] == 'object' && !blacklist[i] && !( this[i] instanceof MapFacade ) ){
-					this._bindProperty( 'off', i, this[i], { name : i } );  // unbind any previous hooks
-					this._bindProperty( 'on', i, this[i], { name : i } );   // now bind to any event declarations
+					this._bindProperty( 'off', i, this[i], i );  // unbind any previous hooks
+					this._bindProperty( 'on', i, this[i], i );   // now bind to any event declarations
 				}
 			}
 		},
