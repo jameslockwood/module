@@ -58,7 +58,7 @@ blockquote {
 }
 
 code, pre {
-  font-family:Monaco, Bitstream Vera Sans Mono, Lucida Console, Terminal;
+  font-family: Consolas, Monaco, Bitstream Vera Sans Mono, Lucida Console, Terminal;
   color:#333;
   font-size:12px;
 }
@@ -177,7 +177,6 @@ hr {
 
 footer {
   width:270px;
-  float:left;
   bottom:50px;
 }
 
@@ -216,6 +215,16 @@ nav ul a {
 nav li.method-head{
   margin-top: 0.5em;
   color: #aaa;
+}
+
+section article {
+  border-top: 1px solid #eee;
+  margin-top: 1em;
+}
+
+section article h3{
+  margin-top: 1em;
+  font-family: Consolas, Monaco, Bitstream Vera Sans Mono, Lucida Console, Terminal;
 }
 
 @media print, screen and (max-width: 960px) {
