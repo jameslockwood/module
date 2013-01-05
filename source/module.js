@@ -144,7 +144,7 @@ var Module = ( function( utils, Map, MapFacade ){
 
 			// creates a callback, injecting additional arguments if required.
 			var makeCallBack = function( fn, event ){
-				
+
 				if( typeof objName !== 'undefined' ){
 					// We need to inject the object and it's id/name into the event callback
 					// To do this we'll create an anonymous function, which will screw up
@@ -204,7 +204,7 @@ var Module = ( function( utils, Map, MapFacade ){
 		// Iterates through an events property (if given), then standardizes all event selectors into a single
 		// object (eventsMap) to enable look-ups.
 		_processEventsSelector : function(){
-			
+
 			var getEventHandler = function( key, event, value ){
 				if( typeof value == 'function' ){
 					return value;
