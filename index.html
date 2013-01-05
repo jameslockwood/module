@@ -39,9 +39,26 @@
 
 				<span class="subtitle">Methods</span>
 				<ul>
-					<li><a href="#module-scope">scope</a></li>
-					<li><a href="#module-scope">$scope</a></li>
-					<li><a href="#module-scope">events</a></li>
+					<li class="method-head">Messaging</li>
+					<li><a href="#module-scope">on</a></li>
+					<li><a href="#module-scope">off</a></li>
+					<li><a href="#module-scope">emit</a></li>
+
+					<li class="method-head">DOM Scope</li>
+					<li><a href="#module-scope">$</a></li>
+					<li><a href="#module-scope">hide</a></li>
+					<li><a href="#module-scope">show</a></li>
+					<li><a href="#module-scope">setScope</a></li>
+
+					<li class="method-head">Utils</li>
+					<li><a href="#module-scope">bindEvents</a></li>
+					<li><a href="#module-scope">createMap</a></li>
+					<li><a href="#module-scope">log</a></li>
+					<li><a href="#module-scope">throwException</a></li>
+
+					<li class="method-head">Lifecycle Management</li>
+					<li><a href="#module-scope">start</a></li>
+					<li><a href="#module-scope">stop</a></li>
 				</ul>
 
 				<span class="subtitle">Functions</span>
@@ -53,19 +70,38 @@
 				<a class="toc-head" href="#module-intro">Map</a>
 				<span class="subtitle">Methods</span>
 				<ul>
-					<li><a href="#module-scope">scope</a></li>
-					<li><a href="#module-scope">$scope</a></li>
-					<li><a href="#module-scope">events</a></li>
+					<li><a href="#module-scope">add</a></li>
+					<li><a href="#module-scope">each</a></li>
+					<li><a href="#module-scope">eachTry</a></li>
+					<li><a href="#module-scope">length</a></li>
+					<li><a href="#module-scope">on</a></li>
+					<li><a href="#module-scope">off</a></li>
+					<li><a href="#module-scope">remove</a></li>
 				</ul>
 
+
+				<a class="toc-head" href="#module-intro">Tutorials</a>
+				<ul>
+					<li><a href="#module-scope">Creating a Module</a></li>
+					<li><a href="#module-scope">Using Module Scope</a></li>
+					<li><a href="#module-scope">Using Maps</a></li>
+					<li><a href="#module-scope">Hooking-up Events</a></li>
+					<li><a href="#module-scope">Creating a Modular Application</a></li>
+					<li><a href="#module-scope">Lifecycle Management</a></li>
+				</ul>
 			</nav>
 
 		</header>
 
 		<section>
-			<h3>Welcome to GitHub Pages.</h3>
 
-			<p>This automatic page generator is the easiest way to create beautiful pages for all of your projects. Author your page content here using GitHub Flavored Markdown, select a template crafted by a designer, and publish. After your page is generated, you can check out the new branch:</p>
+
+			<p>Talk about instances.  No parent / child relationship.  Drop in a module anywhere (providing it a DOM scope if it has any interactions with the DOM),  subscribe to it’s events, and go from there.</p>
+
+			<h2>Introduction</h2>
+			<p>Stuff here...</h2>
+
+			<h2>Module</h2>
 
 			<pre><code>$ cd your_repo_root/repo_name
 			$ git fetch origin

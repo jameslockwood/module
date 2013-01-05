@@ -186,7 +186,7 @@ nav {
 }
 
 nav a.toc-head{
-  margin-top: 1em;
+  margin-top: 1.5em;
   font-weight: bold;
   display: block;
 }
@@ -194,7 +194,7 @@ nav a.toc-head{
 nav span.subtitle {
   display: block;
   margin-left: 0.5em;
-  color: #aaa;
+  color: #333;
   margin-top: 0.5em;
 }
 
@@ -211,6 +211,11 @@ nav ul li {
 
 nav ul a {
 
+}
+
+nav li.method-head{
+  margin-top: 0.5em;
+  color: #aaa;
 }
 
 @media print, screen and (max-width: 960px) {
