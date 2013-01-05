@@ -1,0 +1,31 @@
+Talk about instances.  No parent / child relationship.  Drop in a module anywhere (providing it a DOM scope if it has any interactions with the DOM),  subscribe to it’s events, and go from there.
+
+API
+
+	Module
+		Introduction
+		properties
+		methods
+		static methods ( extend, installEventsTo )
+
+	Map
+		Introduction
+		Methods
+
+Tutorials
+
+	Creating a Module ( declaring the constructor, instantiation, extending, start / stop methods )
+
+	Module scope ( what the scope is, how it’s used, when it’s used – i.e. only required with modules that interact with DOM )
+
+	Adding properties and using Maps (e.g. multiple views and one model,  then move into maps )
+
+	Listening for events
+
+	Module maps in more detail ( how we can add multiple objects to a mapping (socket.io example?), each, etc )
+
+	Creating a modular JavaScript application ( Event-driven architecture.  Each module emits an event.  Mediator sits on top. )
+
+	Module lifecycle management ( start / stop, memory leaks – so cleaning up the DOM, mappings and events ).
+
+Examples
