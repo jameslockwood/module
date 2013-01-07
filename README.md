@@ -6,11 +6,7 @@ It promotes apps to be built using a modular, event-driven architecture. Each mo
 
 The project site (including documentation and tutorials) can be found at http://jameslockwood.github.com/module/
 
-##Quick Start
-TODO - Intro about module here.. what a module knows about, what it doesn't, what are it's responsibilities, what aren't its responsibilities. Event-driven architecture.
-
-###Creating a `Module` Constructor
-We create a Module by extending the module constructor. We pass in an object literal containing properties and methods we wish to place on it's prototype.
+##Quick Start - Creating a `Module` Constructor
 
 In the example below we'll create a simple module that represents an email-client application that consists of: 
 - A chat sub-module
