@@ -4,7 +4,7 @@ Module.js enables you to build large-scale JavaScript applications that are comp
 
 It promotes apps to be built using a modular, event-driven architecture. Each module is aggressively self-concerned, having it's own DOM scope, it's own lifecycle management, and it's own messaging/events mechanism.
 
-The full documentation and tutorials can be found at http://jameslockwood.github.com/module/
+The project site (including documentation and tutorials) can be found at http://jameslockwood.github.com/module/
 
 ##Quick Start
 TODO - Intro about module here.. what a module knows about, what it doesn't, what are it's responsibilities, what aren't its responsibilities. Event-driven architecture.
