@@ -1,8 +1,10 @@
 ##Module JS
 
-ModuleJS is a lightweight library that provides high-level structure to complex web applications, encouraging the creation of apps that comprise of several disparate, self-contained modules.
+Module.js enables you to build large-scale JavaScript applications that are composed of several decoupled, testable and reusable modules.
 
-It allows apps to be easily built using a modular, declarative event-driven architecture.  Each module has it's own DOM scope and is self-concerned, allowing lower-level implementation choices (such as an individual module's usage of views, models etc.) to be decided by the developer.
+It promotes apps to be built using a modular, event-driven architecture. Each module is aggressively self-concerned, having it's own DOM scope, it's own lifecycle management, and it's own messaging/events mechanism.
+
+The full documentation and tutorials can be found at http://jameslockwood.github.com/module/
 
 ##Quick Start
 TODO - Intro about module here.. what a module knows about, what it doesn't, what are it's responsibilities, what aren't its responsibilities. Event-driven architecture.
@@ -75,16 +77,3 @@ var App = Module.extend({
    }
 });
 ```
-
-Each Module should have start,stop and restart methods to give us a strategy to install or uninstall. Additionally, if an initialize method is supplied, it will be invoked upon creation.
-
-
-To make use of the constructor that we've created above, simply instantiate then start:
-``` JavaScript
-var app = new App({
-   scope : '#email-client'  // pass in the applications DOM scope
-});
-app.start()  // start up the module
-```
-We can also pass in a literal into the constructor to add properties / methods to the object instance. E.g. Just like above where we are setting the scope of the Module.
-
