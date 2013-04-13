@@ -33,7 +33,7 @@ describe("Module", function() {
 		});
 
 	});
-	
+
 	describe("Map", function() {
 
 		var mapFacade,
@@ -225,9 +225,9 @@ describe("Module", function() {
 
 		});
 
-		
+
 		it('Should correctly fire events on add / remove', function() {
-			
+
 			// set up an object to alter in our callbacks
 			var results = {
 				get : {},
@@ -270,7 +270,7 @@ describe("Module", function() {
 		});
 
 		it('Should correctly fire events on add / remove for a map array containing many objects', function() {
-			
+
 			var add = 0;
 			var remove = 0;
 
@@ -300,7 +300,7 @@ describe("Module", function() {
 		});
 
 		it('Should correctly emit a remove event when individual object is removed from map array', function() {
-			
+
 			var remove = 0;
 
 			// create our callbacks

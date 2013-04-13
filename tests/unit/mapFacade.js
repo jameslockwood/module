@@ -1,5 +1,5 @@
 describe("MapFacade", function() {
-	
+
 	var map,
 		_internal;
 
@@ -8,7 +8,7 @@ describe("MapFacade", function() {
 		map = new Map( 'testMap' );
 		// get hold of the original from the map facade
 		_internal = map._map;
-	});	
+	});
 
 	describe("length", function() {
 		it('Should return the number of items in the map', function() {
@@ -72,7 +72,7 @@ describe("MapFacade", function() {
 				'third' : new Sample()
 			});
 
-		});		
+		});
 
 		it('Should invoke a method on each item in the map', function() {
 			expect( x ).toBe( 0 );
@@ -132,7 +132,7 @@ describe("MapFacade", function() {
 				'fourth' : new Sample()
 			});
 
-		});		
+		});
 
 		it('Should remove one item from the map', function() {
 			expect( map.length() ).toBe( 4 );
@@ -152,6 +152,6 @@ describe("MapFacade", function() {
 			expect( map.length() ).toBe( 0 );
 		});
 
-	});	
+	});
 
 });

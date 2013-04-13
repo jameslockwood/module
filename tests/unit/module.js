@@ -33,7 +33,7 @@ describe("Module Constructor", function() {
 			expect( _test ).toBe( true );
 		});
 	});
-	
+
 
 	describe("module scope", function() {
 		it('Should allow scope to be set and re-set', function() {
